@@ -39,7 +39,10 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 			cancellationToken,
 			chapterRange: ..1);
 
-		epubDocument.Series = "Хеллиана Валанди";
+		epubDocument.Series ??= AnsiConsole.Prompt(
+			new TextPrompt<string?>("Enter series name")
+				.AllowEmpty()
+				.DefaultValue(null));
 
 		var filePath = epubDocument.WriteToFile();
 		AnsiConsole.MarkupLine($"[green]Book saved to file:[/]\n\t\"{filePath}\"");
