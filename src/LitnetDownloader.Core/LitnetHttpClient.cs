@@ -4,16 +4,19 @@ using AngleSharp.Html.Parser;
 using LitnetDownloader.Core.Exceptions;
 using LitnetDownloader.Core.Parsing;
 using LitnetDownloader.Core.Values;
+using Microsoft.Extensions.Logging;
 
 namespace LitnetDownloader.Core;
 
-public class LitnetHttpClient
+public partial class LitnetHttpClient
 {
 	public TimeSpan BetweenRequestsTimeout { get; set; } = TimeSpan.FromSeconds(seconds: 3);
-	
+
+	private readonly LitnetBrowserClient litnetBrowserClient;
 	private readonly HttpClient httpClient;
 	private readonly HttpClientHandler httpClientHandler;
 	private readonly HtmlParser htmlParser = new();
+	private readonly ILogger<LitnetHttpClient> logger;
 	private string csrfToken = string.Empty;
 
 	private const string BaseUrl = "https://litnet.com";
@@ -21,8 +24,12 @@ public class LitnetHttpClient
 	private const string BookReaderUrlPrefix = "https://litnet.com/reader/";
 	private const string GetPageUrl = "https://litnet.com/reader/get-page";
 
-	public LitnetHttpClient()
+	public LitnetHttpClient(
+		LitnetBrowserClient litnetBrowserClient,
+		ILogger<LitnetHttpClient> logger)
 	{
+		this.litnetBrowserClient = litnetBrowserClient;
+		this.logger = logger;
 		(httpClient, httpClientHandler) = CreateHttpClient();
 	}
 
@@ -33,30 +40,30 @@ public class LitnetHttpClient
 		if (!forceLogin
 			&& await CookieStorage.LoadCookiesAsync() is { Count: > 0 } cookies)
 		{
-			Console.WriteLine($"Loaded {cookies.Count} cookies from storage");
+			LogLoadedCookiesFromStorage(cookies.Count);
 		}
 		else
 		{
-			cookies = await LitnetBrowserClient.AuthenticateAsync();
+			cookies = await litnetBrowserClient.AuthenticateAsync();
 			await CookieStorage.SaveCookiesAsync(cookies);
-			Console.WriteLine("Saved cookies to storage");
+			LogSavedCookiesToStorage();
 		}
 
 		var baseUri = new Uri(BaseUrl);
-		
+
 		foreach (var cookie in cookies)
 			httpClientHandler.CookieContainer.Add(baseUri, cookie);
 
 		var verificationHtml = await httpClient.GetStringAsync(BaseUrl, cancellationToken);
 		using var parsedVerificationHtml = await htmlParser.ParseDocumentAsync(verificationHtml);
 		var csrfTokenMeta = parsedVerificationHtml.QuerySelector("meta[name='csrf-token']");
-		csrfToken = csrfTokenMeta?.GetAttribute("content") 
+		csrfToken = csrfTokenMeta?.GetAttribute("content")
 			?? throw new NoDataException("CSRF token not found after login");
 
 		if (verificationHtml.Contains("Авторизация") || verificationHtml.Contains("LoginForm"))
 			throw new BadAuthorizationException();
 
-		Console.WriteLine("Authentication successful");
+		LogAuthenticationSuccessful();
 	}
 
 	public async Task<BookInfo> GetBookInfoWebPageAsync(string bookSlug, CancellationToken cancellationToken)
@@ -65,11 +72,11 @@ public class LitnetHttpClient
 		var bookInfoUrl = BookInfoUrlPrefix + bookSlug;
 
 		var webPageHtml = await httpClient.GetStringAsync(bookInfoUrl, cancellationToken);
-		Console.WriteLine($"Book info page loaded: {bookInfoUrl}");
+		LogBookInfoPageLoaded(bookInfoUrl);
 
 		var bookInfoPage = await BookInfoWebPage.ParseAsync(webPageHtml, htmlParser);
 		var coverImage = await DownloadImageAsync(bookInfoPage.CoverSource, cancellationToken);
-		
+
 		return new BookInfo(
 			bookInfoPage.Title,
 			bookInfoPage.Author,
@@ -84,11 +91,11 @@ public class LitnetHttpClient
 		var bookReaderUrl = BookReaderUrlPrefix + bookSlug;
 
 		var webPageHtml = await httpClient.GetStringAsync(bookReaderUrl, cancellationToken);
-		Console.WriteLine($"Book reader page loaded: {bookReaderUrl}");
+		LogBookReaderPageLoaded(bookReaderUrl);
 
 		return await BookReaderWebPage.GetChaptersInfoAsync(webPageHtml, htmlParser);
 	}
-	
+
 	public async Task<(string content, bool isPageLast)> GetBookPageContentAsync(
 		string bookSlug,
 		string chapterId,
@@ -108,7 +115,7 @@ public class LitnetHttpClient
 			cancellationToken: cancellationToken);
 
 		var responseText = await response.Content.ReadAsStringAsync(cancellationToken);
-		
+
 		using var jsonDocument = JsonDocument.Parse(responseText);
 		var root = jsonDocument.RootElement;
 
@@ -128,7 +135,7 @@ public class LitnetHttpClient
 
 		return (content, isLast);
 	}
-	
+
 	public async Task<byte[]> DownloadImageAsync(string imageSource, CancellationToken cancellationToken)
 	{
 		if (imageSource.StartsWith("//"))
@@ -142,13 +149,13 @@ public class LitnetHttpClient
 		}
 
 		using var imageResponse = await httpClient.GetAsync(imageUri, cancellationToken);
-		 
+
 		if (!imageResponse.IsSuccessStatusCode)
 			throw new NoDataException("Failed to download cover image");
-		
+
 		return await imageResponse.Content.ReadAsByteArrayAsync(cancellationToken);
 	}
-	
+
 	private async Task<HttpResponseMessage> PostAsync(
 		string url,
 		IEnumerable<KeyValuePair<string, string>> contentParameters,
@@ -167,10 +174,10 @@ public class LitnetHttpClient
 
 		await Task.Delay(BetweenRequestsTimeout, cancellationToken);
 		cancellationToken.ThrowIfCancellationRequested();
-		
+
 		return await httpClient.SendAsync(request, cancellationToken);
 	}
-	
+
 	private static (HttpClient, HttpClientHandler) CreateHttpClient()
 	{
 		var handler = new HttpClientHandler
@@ -186,4 +193,19 @@ public class LitnetHttpClient
 
 		return (httpClient, handler);
 	}
+
+	[LoggerMessage(LogLevel.Information, "Loaded {CookiesCount} cookies from storage")]
+	partial void LogLoadedCookiesFromStorage(int cookiesCount);
+
+	[LoggerMessage(LogLevel.Information, "Saved cookies to storage")]
+	partial void LogSavedCookiesToStorage();
+
+	[LoggerMessage(LogLevel.Information, "Authentication successful")]
+	partial void LogAuthenticationSuccessful();
+
+	[LoggerMessage(LogLevel.Information, "Book info page loaded: {Url}")]
+	partial void LogBookInfoPageLoaded(string url);
+
+	[LoggerMessage(LogLevel.Information, "Book reader page loaded: {Url}")]
+	partial void LogBookReaderPageLoaded(string url);
 }

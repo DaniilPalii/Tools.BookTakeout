@@ -2,12 +2,15 @@ using System.Text;
 using AngleSharp;
 using AngleSharp.Html.Parser;
 using LitnetDownloader.Core.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace LitnetDownloader.Core;
 
-public sealed class BookDownloader(LitnetHttpClient litnetHttpClient)
+public sealed partial class BookDownloader(
+	LitnetHttpClient litnetHttpClient,
+	ILogger<BookDownloader> logger)
 {
-	public Task AuthenticateAsync(CancellationToken cancellationToken, bool forceLogin = false) 
+	public Task AuthenticateAsync(CancellationToken cancellationToken, bool forceLogin = false)
 		=> litnetHttpClient.AuthenticateAsync(cancellationToken, forceLogin);
 
 	public async Task<EpubDocument> DownloadAsEpubAsync(
@@ -15,9 +18,9 @@ public sealed class BookDownloader(LitnetHttpClient litnetHttpClient)
 		CancellationToken cancellationToken,
 		Range? chapterRange = null)
 	{
-		(var title, var author, var annotation, var series, var cover) 
+		(var title, var author, var annotation, var series, var cover)
 			= await litnetHttpClient.GetBookInfoWebPageAsync(bookSlug, cancellationToken);
-		
+
 		var epubDocument = new EpubDocument(title)
 		{
 			Author = author,
@@ -28,8 +31,8 @@ public sealed class BookDownloader(LitnetHttpClient litnetHttpClient)
 		};
 
 		var chapters = await litnetHttpClient.GetBookChaptersAsync(bookSlug, cancellationToken);
-		Console.WriteLine($"Total number of chapters: {chapters.Length}");
-		
+		LogTotalNumberOfChapters(chapters.Length);
+
 		if (chapterRange is not null)
 			chapters = chapters[chapterRange.Value];
 
@@ -39,18 +42,17 @@ public sealed class BookDownloader(LitnetHttpClient litnetHttpClient)
 			{
 				var chapterContent = await GetChapterContentAsync(bookSlug, chapter.Id, epubDocument, cancellationToken);
 				epubDocument.Chapters.Add(new (chapter.Title, chapterContent));
+				LogGotChapter(chapter.Index);
 
-				Console.WriteLine($"Got chapter {chapter.Index}");
-			
 				if (cancellationToken.IsCancellationRequested)
 					break;
 			}
 		}
 		catch (NoDataException ex)
 		{
-			Console.WriteLine($"Error while getting chapters. Saving available data.\n{ex.Message}");
+			LogErrorWhileGettingChaptersSavingAvailableData(ex);
 		}
-		
+
 		return epubDocument;
 	}
 
@@ -77,12 +79,12 @@ public sealed class BookDownloader(LitnetHttpClient litnetHttpClient)
 			}
 		}
 		catch (OperationCanceledException) { }
-		
+
 		return chapterContentBuilder.ToString();;
 	}
 
 	private async Task<string> ReplaceRemoteImagesWithLocalAsync(
-		string pageContent, 
+		string pageContent,
 		EpubDocument epubDocument,
 		CancellationToken cancellationToken)
 	{
@@ -92,12 +94,21 @@ public sealed class BookDownloader(LitnetHttpClient litnetHttpClient)
 		{
 			var imageSource = imageElement.GetAttribute("src")
 				?? throw new NoDataException("Image source not found");
-			
+
 			var image = await litnetHttpClient.DownloadImageAsync(imageSource, cancellationToken);
 			var localPath = epubDocument.AddIllustration(image, imageSource);
 			imageElement.SetAttribute("src", localPath);
 		}
-		
+
 		return htmlDocument.ToHtml();
 	}
+
+	[LoggerMessage(LogLevel.Information, "Total number of chapters: {ChaptersCount}")]
+	partial void LogTotalNumberOfChapters(int chaptersCount);
+
+	[LoggerMessage(LogLevel.Information, "Got chapter {ChapterIndex}")]
+	partial void LogGotChapter(int chapterIndex);
+
+	[LoggerMessage(LogLevel.Error, "Error while getting chapters. Saving available data.")]
+	partial void LogErrorWhileGettingChaptersSavingAvailableData(Exception exception);
 }

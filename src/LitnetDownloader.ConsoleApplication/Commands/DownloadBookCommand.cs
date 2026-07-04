@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using LitnetDownloader.Core;
 using LitnetDownloader.Core.Helpers;
+using Spectre.Console;
 using Spectre.Console.Cli;
 
 namespace LitnetDownloader.ConsoleApplication.Commands;
@@ -10,7 +11,7 @@ public class DownloadBookCommandSettings : CommandSettings
 	[CommandArgument(position: 0, template: "<book-url>")]
 	[Description("URL of the book to download")]
 	public required string BookUrl { get; init; }
-	
+
 	[CommandOption("-f|--forceLogin")]
 	[Description("Prompt login even if previous login is saved")]
 	[DefaultValue(false)]
@@ -27,7 +28,7 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 	{
 		if (!BookUrl.TryGetSlug(settings.BookUrl, out var bookSlug))
 		{
-			Console.WriteLine("Invalid book URL.");
+			AnsiConsole.MarkupLine("[red]Invalid book URL.[/]");
 			return 1;
 		}
 
@@ -41,8 +42,8 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 		epubDocument.Series = "Хеллиана Валанди";
 
 		var filePath = epubDocument.WriteToFile();
-		Console.WriteLine($"Book saved to file:\n\t\"{filePath}\"");
-		Console.WriteLine("Done");
+		AnsiConsole.MarkupLine($"[green]Book saved to file:[/]\n\t\"{filePath}\"");
+		AnsiConsole.MarkupLine("Done");
 		return 0;
 	}
 }

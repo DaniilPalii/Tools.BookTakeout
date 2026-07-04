@@ -1,15 +1,17 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.Playwright;
 
 namespace LitnetDownloader.Core;
 
-internal class LitnetBrowserClient
+public partial class LitnetBrowserClient(
+	ILogger<LitnetBrowserClient> logger)
 {
 	private const string LoginUrl = "https://litnet.com/auth/login?classic=1&link=https%3A%2F%2Flitnet.com%2F";
-	
-	public static async Task<List<System.Net.Cookie>> AuthenticateAsync()
+
+	public async Task<List<System.Net.Cookie>> AuthenticateAsync()
 	{
-		Console.WriteLine("Opening browser for interactive login");
-		
+		LogOpeningBrowserForInteractiveLogin();
+
 		using var playwright = await Playwright.CreateAsync();
 		await using var browser = await playwright.Firefox.LaunchAsync(options: new() { Headless = false });
 		var page = await browser.NewPageAsync();
@@ -19,15 +21,15 @@ internal class LitnetBrowserClient
 			{
 				Timeout = TimeSpan.FromMinutes(15).Milliseconds,
 			});
-		
+
 		await page.GetByText("Обо мне").WaitForAsync(new() { Timeout = TimeSpan.FromMinutes(15).Milliseconds });
-		Console.WriteLine("Log in confirmed");
+		LogLogInConfirmed();
 
 		var playwrightCookies = await page.Context.CookiesAsync();
-		Console.WriteLine($"Got {playwrightCookies.Count} cookies");
-		
+		LogGotCookies(playwrightCookies.Count);
+
 		await browser.CloseAsync();
-		
+
 		return playwrightCookies
 			.Where(cookie => cookie.Domain is ".litnet.com" or "litnet.com")
 			.Select(
@@ -39,4 +41,13 @@ internal class LitnetBrowserClient
 				})
 			.ToList();
 	}
+
+	[LoggerMessage(LogLevel.Information, "Opening browser for interactive login")]
+	partial void LogOpeningBrowserForInteractiveLogin();
+
+	[LoggerMessage(LogLevel.Information, "Log in confirmed")]
+	partial void LogLogInConfirmed();
+
+	[LoggerMessage(LogLevel.Information, "Got {CookiesCount} cookies")]
+	partial void LogGotCookies(int cookiesCount);
 }
