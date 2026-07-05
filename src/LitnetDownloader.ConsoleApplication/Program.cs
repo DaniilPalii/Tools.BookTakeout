@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 using LitnetDownloader.ConsoleApplication.Commands;
 using LitnetDownloader.ConsoleApplication.DependencyInjection;
 using LitnetDownloader.Core;
@@ -11,7 +12,7 @@ Console.InputEncoding = Encoding.UTF8;
 Console.OutputEncoding = Encoding.UTF8;
 
 Log.Logger = new LoggerConfiguration()
-	.MinimumLevel.Debug()
+	.MinimumLevel.Information()
 	.WriteTo.Spectre(outputTemplate: "{Message:lj}{NewLine}{Exception}")
 	.CreateLogger();
 
@@ -24,12 +25,21 @@ try
 		loggingBuilder.AddSerilog(dispose: true);
 	});
 
-	services.AddSingleton<BookDownloader>();
-	services.AddSingleton<LitnetBrowserClient>();
-	services.AddSingleton<LitnetHttpClient>();
+	services.AddSingleton<CookieContainer>();
+	services
+		.AddHttpClient<LitnetHttpClient>(LitnetHttpClient.ConfigureClient)
+		.ConfigurePrimaryHttpMessageHandler(provider =>
+		{
+			var cookieContainer = provider.GetRequiredService<CookieContainer>();
+			return LitnetHttpClient.CreateHandler(cookieContainer);
+		})
+		.RemoveAllLoggers();
 
-	var app = new CommandApp<DownloadBookCommand>(
-		registrar: new TypeRegistrar(services));
+	services.AddTransient<BookDownloader>();
+	services.AddTransient<LitnetBrowserClient>();
+
+	var typeRegistrar = new TypeRegistrar(services);
+	var app = new CommandApp<DownloadBookCommand>(typeRegistrar);
 
 	var returnCode = await app.RunAsync(args);
 

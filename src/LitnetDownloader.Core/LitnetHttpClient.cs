@@ -8,15 +8,15 @@ using Microsoft.Extensions.Logging;
 
 namespace LitnetDownloader.Core;
 
-public partial class LitnetHttpClient
+public partial class LitnetHttpClient(
+	HttpClient httpClient,
+	CookieContainer cookieContainer,
+	LitnetBrowserClient litnetBrowserClient,
+	ILogger<LitnetHttpClient> logger)
 {
 	public TimeSpan BetweenRequestsTimeout { get; set; } = TimeSpan.FromSeconds(seconds: 3);
 
-	private readonly LitnetBrowserClient litnetBrowserClient;
-	private readonly HttpClient httpClient;
-	private readonly HttpClientHandler httpClientHandler;
 	private readonly HtmlParser htmlParser = new();
-	private readonly ILogger<LitnetHttpClient> logger;
 	private string csrfToken = string.Empty;
 
 	private const string BaseUrl = "https://litnet.com";
@@ -24,13 +24,22 @@ public partial class LitnetHttpClient
 	private const string BookReaderUrlPrefix = "https://litnet.com/reader/";
 	private const string GetPageUrl = "https://litnet.com/reader/get-page";
 
-	public LitnetHttpClient(
-		LitnetBrowserClient litnetBrowserClient,
-		ILogger<LitnetHttpClient> logger)
+	public static void ConfigureClient(HttpClient httpClient)
 	{
-		this.litnetBrowserClient = litnetBrowserClient;
-		this.logger = logger;
-		(httpClient, httpClientHandler) = CreateHttpClient();
+		httpClient.Timeout = TimeSpan.FromSeconds(100);
+		httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+		httpClient.DefaultRequestHeaders.AcceptLanguage.ParseAdd("en-US,en;q=0.8");
+		httpClient.DefaultRequestHeaders.Add("x-requested-with", "XMLHttpRequest");
+	}
+
+	public static HttpMessageHandler CreateHandler(CookieContainer cookieContainer)
+	{
+		return new SocketsHttpHandler
+		{
+			CookieContainer = cookieContainer,
+			UseCookies = true,
+			AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+		};
 	}
 
 	public async Task AuthenticateAsync(
@@ -52,7 +61,7 @@ public partial class LitnetHttpClient
 		var baseUri = new Uri(BaseUrl);
 
 		foreach (var cookie in cookies)
-			httpClientHandler.CookieContainer.Add(baseUri, cookie);
+			cookieContainer.Add(baseUri, cookie);
 
 		var verificationHtml = await httpClient.GetStringAsync(BaseUrl, cancellationToken);
 		using var parsedVerificationHtml = await htmlParser.ParseDocumentAsync(verificationHtml);
@@ -176,22 +185,6 @@ public partial class LitnetHttpClient
 		cancellationToken.ThrowIfCancellationRequested();
 
 		return await httpClient.SendAsync(request, cancellationToken);
-	}
-
-	private static (HttpClient, HttpClientHandler) CreateHttpClient()
-	{
-		var handler = new HttpClientHandler
-		{
-			CookieContainer = new(),
-			AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-		};
-
-		var httpClient = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(seconds: 100) };
-		httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(input: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
-		httpClient.DefaultRequestHeaders.AcceptLanguage.ParseAdd(input: "en-US,en;q=0.8");
-		httpClient.DefaultRequestHeaders.Add(name: "x-requested-with", value: "XMLHttpRequest");
-
-		return (httpClient, handler);
 	}
 
 	[LoggerMessage(LogLevel.Information, "Loaded {CookiesCount} cookies from storage")]
