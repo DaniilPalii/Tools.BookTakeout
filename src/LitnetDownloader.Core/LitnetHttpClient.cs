@@ -83,7 +83,7 @@ public partial class LitnetHttpClient(
 		LogBookInfoPageLoaded(bookInfoUrl);
 
 		var bookInfoPage = await BookInfoWebPage.ParseAsync(webPageHtml, htmlParser);
-		var coverImage = await DownloadImageAsync(bookInfoPage.CoverSource, cancellationToken);
+		var coverImage = await DownloadImageAsync(bookInfoPage.CoverSource, "cover", cancellationToken);
 
 		return new BookInfo(
 			bookInfoPage.Title,
@@ -144,7 +144,7 @@ public partial class LitnetHttpClient(
 		return (content, isLast);
 	}
 
-	public async Task<byte[]> DownloadImageAsync(string imageSource, CancellationToken cancellationToken)
+	public async Task<byte[]> DownloadImageAsync(string imageSource, string imageTitle, CancellationToken cancellationToken)
 	{
 		if (imageSource.StartsWith("//"))
 			imageSource = "https:" + imageSource;
@@ -153,13 +153,13 @@ public partial class LitnetHttpClient(
 		if (!Uri.TryCreate(imageSource, UriKind.Absolute, out var imageUri)
 			|| (imageUri.Scheme != Uri.UriSchemeHttp && imageUri.Scheme != Uri.UriSchemeHttps))
 		{
-			throw new NoDataException("Cover image URL is not an absolute HTTP/HTTPS URL");
+			LogInvalidCoverImageUrl(imageSource, imageTitle);
 		}
 
 		using var imageResponse = await httpClient.GetAsync(imageUri, cancellationToken);
 
 		if (!imageResponse.IsSuccessStatusCode)
-			throw new NoDataException("Failed to download cover image");
+			LogFailedToDownloadImage(imageSource, imageTitle, imageResponse.StatusCode);
 
 		return await imageResponse.Content.ReadAsByteArrayAsync(cancellationToken);
 	}
@@ -201,4 +201,10 @@ public partial class LitnetHttpClient(
 
 	[LoggerMessage(LogLevel.Information, "Book reader page loaded: {Url}")]
 	partial void LogBookReaderPageLoaded(string url);
+
+	[LoggerMessage(LogLevel.Warning, "Cover image URL is not an absolute HTTP/HTTPS URL: {ImageSource}, {ImageTitle}")]
+	partial void LogInvalidCoverImageUrl(string imageSource, string imageTitle);
+
+	[LoggerMessage(LogLevel.Warning, "Failed to download image {ImageSource}, {ImageTitle}. Status code: {ImageResponseStatusCode}")]
+	partial void LogFailedToDownloadImage(string imageSource, string imageTitle, HttpStatusCode imageResponseStatusCode);
 }

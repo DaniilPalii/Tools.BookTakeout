@@ -2,6 +2,7 @@ using System.Text;
 using AngleSharp;
 using AngleSharp.Html.Parser;
 using LitnetDownloader.Core.Exceptions;
+using LitnetDownloader.Core.Values;
 using Microsoft.Extensions.Logging;
 
 namespace LitnetDownloader.Core;
@@ -40,7 +41,7 @@ public sealed partial class BookDownloader(
 		{
 			foreach(var chapter in chapters)
 			{
-				var chapterContent = await GetChapterContentAsync(bookSlug, chapter.Id, epubDocument, cancellationToken);
+				var chapterContent = await GetChapterContentAsync(bookSlug, chapter, epubDocument, cancellationToken);
 				epubDocument.Chapters.Add(new (chapter.Title, chapterContent));
 				LogGotChapter(chapter.Index);
 
@@ -58,7 +59,7 @@ public sealed partial class BookDownloader(
 
 	private async Task<string> GetChapterContentAsync(
 		string bookSlug,
-		string chapterId,
+		ChapterInfo chapter,
 		EpubDocument epubDocument,
 		CancellationToken cancellationToken)
 	{
@@ -70,9 +71,9 @@ public sealed partial class BookDownloader(
 			var pageIndex = 1;
 			while (!isPageLast && !cancellationToken.IsCancellationRequested)
 			{
-				(var pageContent, isPageLast) = await litnetHttpClient.GetBookPageContentAsync(bookSlug, chapterId, pageIndex, cancellationToken);
+				(var pageContent, isPageLast) = await litnetHttpClient.GetBookPageContentAsync(bookSlug, chapter.Id, pageIndex, cancellationToken);
 
-				pageContent = await ReplaceRemoteImagesWithLocalAsync(pageContent, epubDocument, cancellationToken);
+				pageContent = await ReplaceRemoteImagesWithLocalAsync(pageContent, epubDocument, imageTitle: $"chapter{chapter.Index}_page{pageIndex}_illustration", cancellationToken);
 
 				chapterContentBuilder.Append(pageContent);
 				pageIndex++;
@@ -86,6 +87,7 @@ public sealed partial class BookDownloader(
 	private async Task<string> ReplaceRemoteImagesWithLocalAsync(
 		string pageContent,
 		EpubDocument epubDocument,
+		string imageTitle,
 		CancellationToken cancellationToken)
 	{
 		var htmlParser = new HtmlParser();
@@ -95,7 +97,7 @@ public sealed partial class BookDownloader(
 			var imageSource = imageElement.GetAttribute("src")
 				?? throw new NoDataException("Image source not found");
 
-			var image = await litnetHttpClient.DownloadImageAsync(imageSource, cancellationToken);
+			var image = await litnetHttpClient.DownloadImageAsync(imageSource, imageTitle, cancellationToken);
 			var localPath = epubDocument.AddIllustration(image, imageSource);
 			imageElement.SetAttribute("src", localPath);
 		}

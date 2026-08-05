@@ -102,11 +102,18 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 			{
 				var epubDocument = await bookDownloader.DownloadAsEpubAsync(
 					bookSlug,
-					cancellationToken,
-					chapterRange: settings.ChaptersCount.HasValue ? ..settings.ChaptersCount.Value : null);
+					cancellationToken);
+
+				AnsiConsole.MarkupLine(
+					$"""
+						[green]Book info:[/]
+							Title: {epubDocument.Title}
+							Author: {epubDocument.Author}
+							Series: {epubDocument.Series}
+						""");
 
 				epubDocument.Series ??= AnsiConsole.Prompt(
-					new TextPrompt<string?>($"Enter series name for book [green]{epubDocument.Title}[/] (optional):")
+					new TextPrompt<string?>($"Enter series name (optional):")
 						.AllowEmpty()
 						.DefaultValue(null));
 
