@@ -75,7 +75,7 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 				.AllowEmpty()
 				.DefaultValue(null));
 
-		var filePath = epubDocument.WriteToFile();
+		var filePath = epubDocument.WriteToFile(location: OsLocations.GetDownloadsPath());
 		AnsiConsole.MarkupLine($"[green]Book saved to file:[/]\n\t\"{filePath}\"");
 		AnsiConsole.MarkupLine("Done");
 

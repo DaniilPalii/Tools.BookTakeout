@@ -8,15 +8,15 @@ public class EpubDocument(string title)
 	public string Title { get; set; } = title;
 
 	public string? Author { get; set; }
-	
+
 	public string? Identifier { get; set; }
 
 	public string? Description { get; set; }
-	
+
 	public string? Publisher { get; set; }
-	
+
 	public string? Language { get; set; }
-	
+
 	public string? Annotation { get; set; }
 
 	public string? Series { get; set; }
@@ -32,29 +32,29 @@ public class EpubDocument(string title)
 
 		var fileName = $"{ImageDirectoryPath}/illustration{illustration.Length}.xhtml";
 		illustrations.Add(new (fileName, illustration, source));
-		
+
 		return fileName;
 	}
 
-	public string WriteToFile(string? fileName = null)
+	public string WriteToFile(string? location = null, string? fileName = null)
 	{
 		var internalEpubDocument = new VieappsEpubDocument();
-		
+
 		if (Identifier is not null)
 			internalEpubDocument.AddBookIdentifier(Identifier);
-		
+
 		if (Author is not null)
 			internalEpubDocument.AddAuthor(Author);
-		
+
 		if (Description is not null)
 			internalEpubDocument.AddDescription(Description);
-		
+
 		if (Publisher is not null)
 			internalEpubDocument.AddPublisher(Publisher);
 
 		if (Language is not null)
 			internalEpubDocument.AddLanguage(Language);
-		
+
 		if (Series is not null)
 			internalEpubDocument.AddMetaItem("calibre:series", Series);
 
@@ -68,20 +68,23 @@ public class EpubDocument(string title)
 		{
 			internalEpubDocument.AddImageData(illustration.FilePath, illustration.Bytes);
 		}
-		
+
 		fileName ??= $"{Author} - {Title}.epub";
 		fileName = FileName.Sanitize(fileName);
 		fileName = FileName.TruncatePreservingExtension(fileName, maxLength: 150);
+		var filePath = location is not null
+			? Path.Combine(location, fileName)
+			: fileName;
 
 		var chapterIndex = 0;
-		
+
 		AddTitlePage(internalEpubDocument, chapterIndex++);
 
 		foreach (var chapter in Chapters)
 			AddChapterFile(internalEpubDocument, chapterIndex++, chapter.Title, chapter.Content);
-		
-		internalEpubDocument.Generate(fileName);
-		return Path.GetFullPath(fileName);
+
+		internalEpubDocument.Generate(filePath);
+		return Path.GetFullPath(filePath);
 	}
 
 	private void AddTitlePage(VieappsEpubDocument internalEpubDocument, int chapterIndex)
@@ -89,7 +92,7 @@ public class EpubDocument(string title)
 		var coverImg = Cover is not null
 			? /* lang=xhtml */ $"""<img src="{CoverFilePath}" alt="Cover" />"""
 			: string.Empty;
-		
+
 		var annotation = Annotation is not null
 			? /* lang=xhtml */ $"<p>{Annotation}</p>"
 			: string.Empty;
@@ -101,7 +104,7 @@ public class EpubDocument(string title)
 	private static void AddChapterFile(VieappsEpubDocument internalEpubDocument, int index, string title, string content)
 	{
 		var chapterFileName = $"chapter{index}.xhtml";
-		var xhtmlContent = 
+		var xhtmlContent =
 			/* lang=xhtml */ $"""
 				<!DOCTYPE html>
 				<html xmlns="http://www.w3.org/1999/xhtml">
@@ -119,7 +122,7 @@ public class EpubDocument(string title)
 		internalEpubDocument.AddXhtmlData(chapterFileName, xhtmlContent);
 		internalEpubDocument.AddNavPoint(title, chapterFileName, index);
 	}
-	
+
 	private readonly List<Illustration> illustrations = [];
 
 	private const string CoverFilePath = $"{ImageDirectoryPath}/cover.jpg";
@@ -128,10 +131,10 @@ public class EpubDocument(string title)
 	public class Chapter(string title, string content)
 	{
 		public string Title { get; set; } = title;
-		
+
 		public string Content { get; set; } = content;
 	}
-	
+
 	private record Illustration(
 		string FilePath,
 		byte[] Bytes,
