@@ -8,9 +8,9 @@ namespace LitnetDownloader.ConsoleApplication.Commands;
 
 public class DownloadBookCommandSettings : CommandSettings
 {
-	[CommandArgument(position: 0, template: "<book-url>")]
+	[CommandArgument(0, "[book-url]")]
 	[Description("URL of the book to download")]
-	public required string BookUrl { get; init; }
+	public string? BookUrl { get; set; }
 
 	[CommandOption("-f|--forceLogin")]
 	[Description("Prompt login even if previous login is saved")]
@@ -30,10 +30,30 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 		DownloadBookCommandSettings settings,
 		CancellationToken cancellationToken)
 	{
-		if (!BookUrl.TryGetSlug(settings.BookUrl, out var bookSlug))
+		string bookSlug = null!;
+
+		if (string.IsNullOrWhiteSpace(settings.BookUrl))
 		{
-			AnsiConsole.MarkupLine("[red]Invalid book URL.[/]");
-			return 1;
+			if (!AnsiConsole.Profile.Capabilities.Interactive)
+			{
+				AnsiConsole.MarkupLine($"[red]Error:[/] {nameof(BookUrl)} is required in non-interactive mode.");
+				return 1;
+			}
+
+			settings.BookUrl = AnsiConsole.Prompt(
+				new TextPrompt<string>("Enter the [green]URL of the book[/]:")
+					.PromptStyle("cyan")
+					.Validate(url => BookUrl.TryGetSlug(url, out bookSlug)
+						? ValidationResult.Success()
+						: ValidationResult.Error("[red]Please enter a valid HTTP/HTTPS URL[/]")));
+		}
+		else
+		{
+			if (!BookUrl.TryGetSlug(settings.BookUrl, out bookSlug))
+			{
+				AnsiConsole.MarkupLine("[red]Invalid book URL.[/]");
+				return 1;
+			}
 		}
 
 		await bookDownloader.AuthenticateAsync(cancellationToken, settings.ForceLogin);
