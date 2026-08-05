@@ -16,7 +16,7 @@ internal record BookInfoWebPage(
 		IHtmlParser htmlParser)
 	{
 		using var htmlDocument = await htmlParser.ParseDocumentAsync(webPageHtml);
-		
+
 		return new(
 			Title: GetTitle(htmlDocument),
 			Author: GetAuthor(htmlDocument),
@@ -33,7 +33,7 @@ internal record BookInfoWebPage(
 
 	private static string GetAuthor(IHtmlDocument htmlDocument)
 	{
-		return htmlDocument.QuerySelector(".book-view-info .author span")?.TextContent.Trim()
+		return htmlDocument.QuerySelector(".book-view-info .author")?.TextContent.Trim()
 			?? throw new NoDataException("Author not found");
 	}
 
@@ -42,7 +42,7 @@ internal record BookInfoWebPage(
 		return htmlDocument.QuerySelector("#annotation div")?.InnerHtml.Trim()
 			?? throw new NoDataException("Annotation not found");
 	}
-	
+
 	private static string? GetSeries(IHtmlDocument htmlDocument)
 	{
 		return htmlDocument

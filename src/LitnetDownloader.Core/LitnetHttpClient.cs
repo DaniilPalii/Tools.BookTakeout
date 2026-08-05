@@ -29,7 +29,6 @@ public partial class LitnetHttpClient(
 		httpClient.Timeout = TimeSpan.FromSeconds(100);
 		httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
 		httpClient.DefaultRequestHeaders.AcceptLanguage.ParseAdd("en-US,en;q=0.8");
-		httpClient.DefaultRequestHeaders.Add("x-requested-with", "XMLHttpRequest");
 	}
 
 	public static HttpMessageHandler CreateHandler(CookieContainer cookieContainer)
@@ -177,6 +176,7 @@ public partial class LitnetHttpClient(
 		request.Content = requestContent;
 		request.Headers.Add(name: "Origin", value: BaseUrl);
 		request.Headers.Referrer = new Uri(referer);
+		request.Headers.Add(name: "x-requested-with", value: "XMLHttpRequest");
 
 		if (!string.IsNullOrEmpty(csrfToken))
 			request.Headers.Add(name: "x-csrf-token", value: csrfToken);
