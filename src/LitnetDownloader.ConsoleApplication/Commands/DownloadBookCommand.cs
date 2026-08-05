@@ -16,6 +16,10 @@ public class DownloadBookCommandSettings : CommandSettings
 	[Description("Prompt login even if previous login is saved")]
 	[DefaultValue(false)]
 	public bool ForceLogin { get; init; } = false;
+
+	[CommandOption("-c|--chaptersCount")]
+	[Description("The number of chapters. All if value not provided.")]
+	public int? ChaptersCount { get; set; }
 }
 
 public class DownloadBookCommand(BookDownloader bookDownloader)
@@ -37,7 +41,7 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 		var epubDocument = await bookDownloader.DownloadAsEpubAsync(
 			bookSlug,
 			cancellationToken,
-			chapterRange: ..1);
+			chapterRange: settings.ChaptersCount.HasValue ? ..settings.ChaptersCount.Value : null);
 
 		epubDocument.Series ??= AnsiConsole.Prompt(
 			new TextPrompt<string?>("Enter series name")
