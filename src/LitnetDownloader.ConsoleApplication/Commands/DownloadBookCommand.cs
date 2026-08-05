@@ -20,6 +20,11 @@ public class DownloadBookCommandSettings : CommandSettings
 	[CommandOption("-c|--chaptersCount")]
 	[Description("The number of chapters. All if value not provided.")]
 	public int? ChaptersCount { get; set; }
+
+	[CommandOption("-i|--interactive")]
+	[Description("Interactive prompt")]
+	[DefaultValue(false)]
+	public bool Interactive { get; set; } = false;
 }
 
 public class DownloadBookCommand(BookDownloader bookDownloader)
@@ -34,6 +39,8 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 
 		if (string.IsNullOrWhiteSpace(settings.BookUrl))
 		{
+			settings.Interactive = true;
+
 			if (!AnsiConsole.Profile.Capabilities.Interactive)
 			{
 				AnsiConsole.MarkupLine($"[red]Error:[/] {nameof(BookUrl)} is required in non-interactive mode.");
@@ -71,6 +78,13 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 		var filePath = epubDocument.WriteToFile();
 		AnsiConsole.MarkupLine($"[green]Book saved to file:[/]\n\t\"{filePath}\"");
 		AnsiConsole.MarkupLine("Done");
+
+		if (settings.Interactive)
+		{
+			AnsiConsole.MarkupLine("Press any key to exit...");
+			Console.ReadKey(intercept: true);
+		}
+
 		return 0;
 	}
 }
