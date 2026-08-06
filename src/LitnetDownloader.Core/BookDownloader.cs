@@ -73,7 +73,11 @@ public sealed partial class BookDownloader(
 			{
 				(var pageContent, isPageLast) = await litnetHttpClient.GetBookPageContentAsync(bookSlug, chapter.Id, pageIndex, cancellationToken);
 
-				pageContent = await ReplaceRemoteImagesWithLocalAsync(pageContent, epubDocument, imageTitle: $"chapter{chapter.Index}_page{pageIndex}_illustration", cancellationToken);
+				pageContent = await ReplaceRemoteImagesWithLocalAsync(
+					pageContent,
+					epubDocument,
+					imageDescription: $"Illustration for chapter {chapter.Index} page {pageIndex}",
+					cancellationToken);
 
 				chapterContentBuilder.Append(pageContent);
 				pageIndex++;
@@ -87,7 +91,7 @@ public sealed partial class BookDownloader(
 	private async Task<string> ReplaceRemoteImagesWithLocalAsync(
 		string pageContent,
 		EpubDocument epubDocument,
-		string imageTitle,
+		string imageDescription,
 		CancellationToken cancellationToken)
 	{
 		var htmlParser = new HtmlParser();
@@ -97,7 +101,7 @@ public sealed partial class BookDownloader(
 			var imageSource = imageElement.GetAttribute("src")
 				?? throw new NoDataException("Image source not found");
 
-			var image = await litnetHttpClient.DownloadImageAsync(imageSource, imageTitle, cancellationToken);
+			var image = await litnetHttpClient.DownloadImageAsync(imageSource, imageDescription, cancellationToken);
 			var localPath = epubDocument.AddIllustration(image, imageSource);
 			imageElement.SetAttribute("src", localPath);
 		}

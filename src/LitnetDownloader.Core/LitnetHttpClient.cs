@@ -83,7 +83,7 @@ public partial class LitnetHttpClient(
 		LogBookInfoPageLoaded(bookInfoUrl);
 
 		var bookInfoPage = await BookInfoWebPage.ParseAsync(webPageHtml, htmlParser);
-		var coverImage = await DownloadImageAsync(bookInfoPage.CoverSource, "cover", cancellationToken);
+		var coverImage = await DownloadImageAsync(bookInfoPage.CoverSource, "Cover", cancellationToken);
 
 		return new BookInfo(
 			bookInfoPage.Title,
@@ -144,7 +144,7 @@ public partial class LitnetHttpClient(
 		return (content, isLast);
 	}
 
-	public async Task<byte[]> DownloadImageAsync(string imageSource, string imageTitle, CancellationToken cancellationToken)
+	public async Task<byte[]> DownloadImageAsync(string imageSource, string imageDescription, CancellationToken cancellationToken)
 	{
 		if (imageSource.StartsWith("//"))
 			imageSource = "https:" + imageSource;
@@ -153,13 +153,13 @@ public partial class LitnetHttpClient(
 		if (!Uri.TryCreate(imageSource, UriKind.Absolute, out var imageUri)
 			|| (imageUri.Scheme != Uri.UriSchemeHttp && imageUri.Scheme != Uri.UriSchemeHttps))
 		{
-			LogInvalidCoverImageUrl(imageSource, imageTitle);
+			LogInvalidCoverImageUrl(imageSource, imageDescription);
 		}
 
 		using var imageResponse = await httpClient.GetAsync(imageUri, cancellationToken);
 
 		if (!imageResponse.IsSuccessStatusCode)
-			LogFailedToDownloadImage(imageSource, imageTitle, imageResponse.StatusCode);
+			LogFailedToDownloadImage(imageSource, imageDescription, imageResponse.StatusCode);
 
 		return await imageResponse.Content.ReadAsByteArrayAsync(cancellationToken);
 	}
