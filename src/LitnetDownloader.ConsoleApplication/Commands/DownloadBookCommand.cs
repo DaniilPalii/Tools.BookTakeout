@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Linq;
 using LitnetDownloader.Core;
 using LitnetDownloader.Core.Helpers;
 using Spectre.Console;
@@ -13,14 +12,10 @@ public class DownloadBookCommandSettings : CommandSettings
 	[Description("URLs of the books to download (space or comma separated)")]
 	public string[]? BookUrls { get; set; }
 
-	[CommandOption("-f|--forceLogin")]
+	[CommandOption("-r|--relogin")]
 	[Description("Prompt login even if previous login is saved")]
 	[DefaultValue(false)]
 	public bool ForceLogin { get; init; } = false;
-
-	[CommandOption("-c|--chaptersCount")]
-	[Description("The number of chapters. All if value not provided.")]
-	public int? ChaptersCount { get; set; }
 
 	[CommandOption("-i|--interactive")]
 	[Description("Interactive prompt")]
@@ -30,6 +25,14 @@ public class DownloadBookCommandSettings : CommandSettings
 	[CommandOption("-d|--directory")]
 	[Description("The directory where the books will be saved.")]
 	public string? Directory { get; set; }
+
+	[CommandOption("-f|--fromChapter")]
+	[Description("The starting chapter number.")]
+	public int? FromChapter { get; set; }
+
+	[CommandOption("-t|--toChapter")]
+	[Description("The ending chapter number.")]
+	public int? ToChapter { get; set; }
 }
 
 public class DownloadBookCommand(BookDownloader bookDownloader)
@@ -102,7 +105,8 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 			{
 				var epubDocument = await bookDownloader.DownloadAsEpubAsync(
 					bookSlug,
-					cancellationToken);
+					cancellationToken,
+					chapterRange: (settings.FromChapter ?? 0)..(settings.ToChapter ?? ^0));
 
 				AnsiConsole.MarkupLine(
 					$"""
