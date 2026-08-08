@@ -3,17 +3,23 @@ using System.Text.Json;
 
 namespace BookTakeout.Core;
 
-internal static class CookieStorage
+public class CookieStorage(string profileDirectoryName)
 {
-	private static readonly string FilePath = Path.Combine(AppContext.BaseDirectory, ".cookies");
+	private string FilePath
+		=> Path.Combine(
+			Environment.GetFolderPath(
+				Environment.SpecialFolder.LocalApplicationData,
+				Environment.SpecialFolderOption.Create),
+			profileDirectoryName,
+			"Cookies");
 
-	public static async Task SaveCookiesAsync(List<Cookie> cookies)
+	public async Task SaveCookiesAsync(List<Cookie> cookies)
 	{
 		await using var fileStream = new StreamWriter(FilePath, append: false);
 		await JsonSerializer.SerializeAsync(fileStream.BaseStream, cookies);
 	}
 
-	public static async Task<List<Cookie>> LoadCookiesAsync()
+	public async Task<List<Cookie>> LoadCookiesAsync()
 	{
 		if (!File.Exists(FilePath))
 			return [];

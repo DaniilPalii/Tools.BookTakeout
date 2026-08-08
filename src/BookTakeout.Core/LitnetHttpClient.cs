@@ -11,6 +11,7 @@ namespace BookTakeout.Core;
 public partial class LitnetHttpClient(
 	HttpClient httpClient,
 	CookieContainer cookieContainer,
+	CookieStorage cookieStorage,
 	LitnetBrowserClient litnetBrowserClient,
 	ILogger<LitnetHttpClient> logger)
 {
@@ -46,14 +47,14 @@ public partial class LitnetHttpClient(
 		bool forceLogin = false)
 	{
 		if (!forceLogin
-			&& await CookieStorage.LoadCookiesAsync() is { Count: > 0 } cookies)
+			&& await cookieStorage.LoadCookiesAsync() is { Count: > 0 } cookies)
 		{
 			LogLoadedCookiesFromStorage(cookies.Count);
 		}
 		else
 		{
 			cookies = await litnetBrowserClient.AuthenticateAsync();
-			await CookieStorage.SaveCookiesAsync(cookies);
+			await cookieStorage.SaveCookiesAsync(cookies);
 			LogSavedCookiesToStorage();
 		}
 
