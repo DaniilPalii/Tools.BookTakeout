@@ -117,7 +117,7 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 						""");
 
 				epubDocument.Series ??= AnsiConsole.Prompt(
-					new TextPrompt<string?>($"Enter series name (optional):")
+					new TextPrompt<string?>("Enter series name")
 						.AllowEmpty()
 						.DefaultValue(null));
 
