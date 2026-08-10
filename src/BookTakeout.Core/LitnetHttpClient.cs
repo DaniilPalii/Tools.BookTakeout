@@ -150,7 +150,6 @@ public partial class LitnetHttpClient(
 		if (imageSource.StartsWith("//"))
 			imageSource = "https:" + imageSource;
 
-		// Expected URL is similar to https://publiccdn.litnet.com/books/covers/0/1668613814_74.jpg
 		if (!Uri.TryCreate(imageSource, UriKind.Absolute, out var imageUri)
 			|| (imageUri.Scheme != Uri.UriSchemeHttp && imageUri.Scheme != Uri.UriSchemeHttps))
 		{
@@ -203,7 +202,7 @@ public partial class LitnetHttpClient(
 	[LoggerMessage(LogLevel.Information, "Book reader page loaded: {Url}")]
 	partial void LogBookReaderPageLoaded(string url);
 
-	[LoggerMessage(LogLevel.Warning, "Cover image URL is not an absolute HTTP/HTTPS URL: {ImageSource}, {ImageTitle}")]
+	[LoggerMessage(LogLevel.Warning, "Image URL is not an absolute HTTP/HTTPS URL: {ImageSource}, {ImageTitle}")]
 	partial void LogInvalidCoverImageUrl(string imageSource, string imageTitle);
 
 	[LoggerMessage(LogLevel.Warning, "Failed to download image {ImageSource}, {ImageTitle}. Status code: {ImageResponseStatusCode}")]

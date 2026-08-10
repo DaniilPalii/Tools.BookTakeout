@@ -1,5 +1,6 @@
 using System.Text;
 using AngleSharp;
+using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using BookTakeout.Core.Exceptions;
 using BookTakeout.Core.Values;
@@ -96,10 +97,19 @@ public sealed partial class BookDownloader(
 	{
 		var htmlParser = new HtmlParser();
 		using var htmlDocument = await htmlParser.ParseDocumentAsync(pageContent);
+
 		foreach (var imageElement in htmlDocument.Images)
 		{
-			var imageSource = imageElement.GetAttribute("src")
-				?? throw new NoDataException("Image source not found");
+			var imageSource = imageElement.GetAttribute("src");
+
+			if (string.IsNullOrWhiteSpace(imageSource))
+			{
+				LogImageSourceIsEmpty();
+				continue;
+			}
+
+			if (IsBase64(imageSource))
+				continue;
 
 			var image = await litnetHttpClient.DownloadImageAsync(imageSource, imageDescription, cancellationToken);
 			var localPath = epubDocument.AddIllustration(image, imageSource);
@@ -107,6 +117,12 @@ public sealed partial class BookDownloader(
 		}
 
 		return htmlDocument.ToHtml();
+	}
+
+	private static bool IsBase64(string imageSource)
+	{
+		return imageSource.StartsWith("data:", StringComparison.OrdinalIgnoreCase) &&
+			imageSource.Contains(";base64,", StringComparison.OrdinalIgnoreCase);
 	}
 
 	[LoggerMessage(LogLevel.Information, "Total number of chapters: {ChaptersCount}")]
@@ -117,4 +133,7 @@ public sealed partial class BookDownloader(
 
 	[LoggerMessage(LogLevel.Error, "Error while getting chapters. Saving available data.")]
 	partial void LogErrorWhileGettingChaptersSavingAvailableData(Exception exception);
+
+	[LoggerMessage(LogLevel.Warning, "Image source is empty")]
+	partial void LogImageSourceIsEmpty();
 }
