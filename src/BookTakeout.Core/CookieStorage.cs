@@ -1,5 +1,5 @@
 using System.Net;
-using System.Text.Json;
+using MemoryPack;
 
 namespace BookTakeout.Core;
 
@@ -16,7 +16,7 @@ public class CookieStorage(string profileDirectoryName)
 	public async Task SaveCookiesAsync(List<Cookie> cookies)
 	{
 		await using var fileStream = new StreamWriter(FilePath, append: false);
-		await JsonSerializer.SerializeAsync(fileStream.BaseStream, cookies);
+		await MemoryPackSerializer.SerializeAsync(fileStream.BaseStream, cookies);
 	}
 
 	public async Task<List<Cookie>> LoadCookiesAsync()
@@ -26,7 +26,7 @@ public class CookieStorage(string profileDirectoryName)
 
 		using var fileStream = new StreamReader(FilePath);
 
-		return await JsonSerializer.DeserializeAsync<List<Cookie>>(fileStream.BaseStream)
+		return await MemoryPackSerializer.DeserializeAsync<List<Cookie>>(fileStream.BaseStream)
 			?? [];
 	}
 }

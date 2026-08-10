@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="AngleSharp" Version="1.5.1" />
+      <PackageReference Include="MemoryPack" Version="1.21.4" />
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
       <PackageReference Include="Microsoft.Playwright" Version="1.60.0" />
       <PackageReference Include="VIEApps.Components.Utility.Epub" Version="10.10.2606.1" />
