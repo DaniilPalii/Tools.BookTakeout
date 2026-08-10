@@ -1,18 +1,13 @@
-﻿using System.Text;
-using BookTakeout.ConsoleApplication.Commands;
+﻿using BookTakeout.ConsoleApplication.Commands;
+using BookTakeout.ConsoleApplication.Configuration;
 using BookTakeout.ConsoleApplication.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using Serilog.Sinks.Spectre;
 using Spectre.Console.Cli;
 
-Console.InputEncoding = Encoding.UTF8;
-Console.OutputEncoding = Encoding.UTF8;
-
-Log.Logger = new LoggerConfiguration()
-	.MinimumLevel.Information()
-	.WriteTo.Spectre(outputTemplate: "{Message:lj}{NewLine}{Exception}")
-	.CreateLogger();
+ConsoleEncoding.Configure();
+SerilogLogging.Configure();
+MemoryPackSerialization.Configure();
 
 try
 {
@@ -30,7 +25,6 @@ try
 catch (Exception ex)
 {
 	Log.Fatal(ex, messageTemplate: "Application terminated unexpectedly");
-
 	return 1;
 }
 finally
