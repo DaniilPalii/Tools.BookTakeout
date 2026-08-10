@@ -5,16 +5,22 @@ namespace BookTakeout.Core;
 
 public class CookieStorage(string profileDirectoryName)
 {
-	private string FilePath
+	private string DirectoryPath
 		=> Path.Combine(
 			Environment.GetFolderPath(
 				Environment.SpecialFolder.LocalApplicationData,
 				Environment.SpecialFolderOption.Create),
-			profileDirectoryName,
+			"BookTakeout",
+			profileDirectoryName);
+
+	private string FilePath
+		=> Path.Combine(
+			DirectoryPath,
 			"Cookies");
 
 	public async Task SaveCookiesAsync(List<Cookie> cookies)
 	{
+		Directory.CreateDirectory(DirectoryPath);
 		await using var fileStream = new StreamWriter(FilePath, append: false);
 		await MemoryPackSerializer.SerializeAsync(fileStream.BaseStream, cookies);
 	}
