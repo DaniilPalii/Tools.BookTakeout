@@ -24,7 +24,7 @@ public sealed class TypeRegistrar(IServiceCollection services) : ITypeRegistrar
 	{
 		services.AddSingleton(service, _ => factory());
 	}
-	
+
 	private sealed class TypeResolver(IServiceProvider provider) : ITypeResolver
 	{
 		public object? Resolve(Type? type)

@@ -15,12 +15,12 @@ public class DownloadBookCommandSettings : CommandSettings
 	[CommandOption("-r|--relogin")]
 	[Description("Prompt login even if previous login is saved")]
 	[DefaultValue(false)]
-	public bool ForceLogin { get; init; } = false;
+	public bool ForceLogin { get; set; }
 
 	[CommandOption("-i|--interactive")]
 	[Description("Interactive prompt")]
 	[DefaultValue(false)]
-	public bool Interactive { get; set; } = false;
+	public bool Interactive { get; set; }
 
 	[CommandOption("-d|--directory")]
 	[Description("The directory where the books will be saved.")]

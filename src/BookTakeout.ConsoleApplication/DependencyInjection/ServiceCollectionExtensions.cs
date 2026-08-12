@@ -7,7 +7,7 @@ namespace BookTakeout.ConsoleApplication.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-	extension (ServiceCollection services)
+	extension(ServiceCollection services)
 	{
 		public void AddAppLogger()
 		{

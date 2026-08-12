@@ -8,8 +8,10 @@ public static class SerilogLogging
 	public static void Configure()
 	{
 		Log.Logger = new LoggerConfiguration()
-			.MinimumLevel.Information()
-			.WriteTo.Spectre(outputTemplate: "{Message:lj}{NewLine}{Exception}")
+			.MinimumLevel
+			.Information()
+			.WriteTo
+			.Spectre(outputTemplate: "{Message:lj}{NewLine}{Exception}")
 			.CreateLogger();
 	}
 }

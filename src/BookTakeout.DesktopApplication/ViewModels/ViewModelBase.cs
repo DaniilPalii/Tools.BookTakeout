@@ -2,5 +2,4 @@
 
 namespace BookTakeout.DesktopApplication.ViewModels;
 
-public abstract class ViewModelBase : ObservableObject
-{ }
+public abstract class ViewModelBase : ObservableObject;

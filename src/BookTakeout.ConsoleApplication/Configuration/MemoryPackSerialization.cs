@@ -1,4 +1,3 @@
-using System.Net;
 using BookTakeout.Core.Serialization.Cookies;
 using MemoryPack;
 
@@ -8,6 +7,6 @@ public static class MemoryPackSerialization
 {
 	public static void Configure()
 	{
-		MemoryPackFormatterProvider.Register<Cookie>(new CookieMemoryPackFormatter());
+		MemoryPackFormatterProvider.Register(new CookieMemoryPackFormatter());
 	}
 }
