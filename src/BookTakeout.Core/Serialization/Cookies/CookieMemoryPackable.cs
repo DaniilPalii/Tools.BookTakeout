@@ -11,5 +11,4 @@ internal partial record CookieMemoryPackable(
 	bool Secure,
 	bool HttpOnly,
 	DateTime Expires,
-	int Version
-);
+	int Version);

@@ -5,19 +5,6 @@ namespace BookTakeout.Core;
 
 public class CookieStorage(string profileDirectoryName)
 {
-	private string DirectoryPath
-		=> Path.Combine(
-			Environment.GetFolderPath(
-				Environment.SpecialFolder.LocalApplicationData,
-				Environment.SpecialFolderOption.Create),
-			"BookTakeout",
-			profileDirectoryName);
-
-	private string FilePath
-		=> Path.Combine(
-			DirectoryPath,
-			"Cookies");
-
 	public async Task SaveCookiesAsync(List<Cookie> cookies)
 	{
 		Directory.CreateDirectory(DirectoryPath);
@@ -35,4 +22,17 @@ public class CookieStorage(string profileDirectoryName)
 		return await MemoryPackSerializer.DeserializeAsync<List<Cookie>>(fileStream.BaseStream)
 			?? [];
 	}
+
+	private string DirectoryPath
+		=> Path.Combine(
+			Environment.GetFolderPath(
+				Environment.SpecialFolder.LocalApplicationData,
+				Environment.SpecialFolderOption.Create),
+			"BookTakeout",
+			profileDirectoryName);
+
+	private string FilePath
+		=> Path.Combine(
+			DirectoryPath,
+			"Cookies");
 }

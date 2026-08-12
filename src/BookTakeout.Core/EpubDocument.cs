@@ -31,7 +31,7 @@ public class EpubDocument(string title)
 			return existingIllustration.FilePath;
 
 		var fileName = $"{ImageDirectoryPath}/illustration{illustration.Length}.xhtml";
-		illustrations.Add(new (fileName, illustration, source));
+		illustrations.Add(new(fileName, illustration, source));
 
 		return fileName;
 	}

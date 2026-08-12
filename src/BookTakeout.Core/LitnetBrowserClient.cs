@@ -6,8 +6,6 @@ namespace BookTakeout.Core;
 public partial class LitnetBrowserClient(
 	ILogger<LitnetBrowserClient> logger)
 {
-	private const string LoginUrl = "https://litnet.com/auth/login?classic=1&link=https%3A%2F%2Flitnet.com%2F";
-
 	public async Task<List<System.Net.Cookie>> AuthenticateAsync()
 	{
 		LogOpeningBrowserForInteractiveLogin();
@@ -32,22 +30,23 @@ public partial class LitnetBrowserClient(
 
 		return playwrightCookies
 			.Where(cookie => cookie.Domain is ".litnet.com" or "litnet.com")
-			.Select(
-				playwrightCookie => new System.Net.Cookie(playwrightCookie.Name, playwrightCookie.Value)
-				{
-					Domain = playwrightCookie.Domain,
-					Path = playwrightCookie.Path,
-					Secure = playwrightCookie.Secure,
-				})
+			.Select(playwrightCookie => new System.Net.Cookie(playwrightCookie.Name, playwrightCookie.Value)
+			{
+				Domain = playwrightCookie.Domain,
+				Path = playwrightCookie.Path,
+				Secure = playwrightCookie.Secure,
+			})
 			.ToList();
 	}
 
 	[LoggerMessage(LogLevel.Information, "Opening browser for interactive login")]
-	partial void LogOpeningBrowserForInteractiveLogin();
+	private partial void LogOpeningBrowserForInteractiveLogin();
 
 	[LoggerMessage(LogLevel.Information, "Log in confirmed")]
-	partial void LogLogInConfirmed();
+	private partial void LogLogInConfirmed();
 
 	[LoggerMessage(LogLevel.Information, "Got {CookiesCount} cookies")]
-	partial void LogGotCookies(int cookiesCount);
+	private partial void LogGotCookies(int cookiesCount);
+
+	private const string LoginUrl = "https://litnet.com/auth/login?classic=1&link=https%3A%2F%2Flitnet.com%2F";
 }

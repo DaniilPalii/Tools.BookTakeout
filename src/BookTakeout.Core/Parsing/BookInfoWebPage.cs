@@ -47,8 +47,8 @@ internal record BookInfoWebPage(
 	{
 		return htmlDocument
 			.QuerySelector(
-				"div.book-view-info-coll:nth-child(1) > div:nth-child(1) > p:nth-child(3) > a:nth-child(2)")?
-			.TextContent
+				"div.book-view-info-coll:nth-child(1) > div:nth-child(1) > p:nth-child(3) > a:nth-child(2)")
+			?.TextContent
 			.Trim();
 	}
 

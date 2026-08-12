@@ -15,16 +15,6 @@ public partial class LitnetHttpClient(
 	LitnetBrowserClient litnetBrowserClient,
 	ILogger<LitnetHttpClient> logger)
 {
-	public TimeSpan BetweenRequestsTimeout { get; set; } = TimeSpan.FromSeconds(seconds: 3);
-
-	private readonly HtmlParser htmlParser = new();
-	private string csrfToken = string.Empty;
-
-	private const string BaseUrl = "https://litnet.com";
-	private const string BookInfoUrlPrefix = "https://litnet.com/book/";
-	private const string BookReaderUrlPrefix = "https://litnet.com/reader/";
-	private const string GetPageUrl = "https://litnet.com/reader/get-page";
-
 	public static void ConfigureClient(HttpClient httpClient)
 	{
 		httpClient.Timeout = TimeSpan.FromSeconds(100);
@@ -41,6 +31,8 @@ public partial class LitnetHttpClient(
 			AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
 		};
 	}
+
+	public TimeSpan BetweenRequestsTimeout { get; set; } = TimeSpan.FromSeconds(seconds: 3);
 
 	public async Task AuthenticateAsync(
 		CancellationToken cancellationToken,
@@ -86,7 +78,7 @@ public partial class LitnetHttpClient(
 		var bookInfoPage = await BookInfoWebPage.ParseAsync(webPageHtml, htmlParser);
 		var coverImage = await DownloadImageAsync(bookInfoPage.CoverSource, "Cover", cancellationToken);
 
-		return new BookInfo(
+		return new(
 			bookInfoPage.Title,
 			bookInfoPage.Author,
 			bookInfoPage.Annotation,
@@ -175,7 +167,7 @@ public partial class LitnetHttpClient(
 
 		request.Content = requestContent;
 		request.Headers.Add(name: "Origin", value: BaseUrl);
-		request.Headers.Referrer = new Uri(referer);
+		request.Headers.Referrer = new(referer);
 		request.Headers.Add(name: "x-requested-with", value: "XMLHttpRequest");
 
 		if (!string.IsNullOrEmpty(csrfToken))
@@ -188,23 +180,31 @@ public partial class LitnetHttpClient(
 	}
 
 	[LoggerMessage(LogLevel.Information, "Loaded {CookiesCount} cookies from storage")]
-	partial void LogLoadedCookiesFromStorage(int cookiesCount);
+	private partial void LogLoadedCookiesFromStorage(int cookiesCount);
 
 	[LoggerMessage(LogLevel.Information, "Saved cookies to storage")]
-	partial void LogSavedCookiesToStorage();
+	private partial void LogSavedCookiesToStorage();
 
 	[LoggerMessage(LogLevel.Information, "Authentication successful")]
-	partial void LogAuthenticationSuccessful();
+	private partial void LogAuthenticationSuccessful();
 
 	[LoggerMessage(LogLevel.Information, "Book info page loaded: {Url}")]
-	partial void LogBookInfoPageLoaded(string url);
+	private partial void LogBookInfoPageLoaded(string url);
 
 	[LoggerMessage(LogLevel.Information, "Book reader page loaded: {Url}")]
-	partial void LogBookReaderPageLoaded(string url);
+	private partial void LogBookReaderPageLoaded(string url);
 
 	[LoggerMessage(LogLevel.Warning, "Image URL is not an absolute HTTP/HTTPS URL: {ImageSource}, {ImageTitle}")]
-	partial void LogInvalidCoverImageUrl(string imageSource, string imageTitle);
+	private partial void LogInvalidCoverImageUrl(string imageSource, string imageTitle);
 
 	[LoggerMessage(LogLevel.Warning, "Failed to download image {ImageSource}, {ImageTitle}. Status code: {ImageResponseStatusCode}")]
-	partial void LogFailedToDownloadImage(string imageSource, string imageTitle, HttpStatusCode imageResponseStatusCode);
+	private partial void LogFailedToDownloadImage(string imageSource, string imageTitle, HttpStatusCode imageResponseStatusCode);
+
+	private readonly HtmlParser htmlParser = new();
+	private string csrfToken = string.Empty;
+
+	private const string BaseUrl = "https://litnet.com";
+	private const string BookInfoUrlPrefix = "https://litnet.com/book/";
+	private const string BookReaderUrlPrefix = "https://litnet.com/reader/";
+	private const string GetPageUrl = "https://litnet.com/reader/get-page";
 }

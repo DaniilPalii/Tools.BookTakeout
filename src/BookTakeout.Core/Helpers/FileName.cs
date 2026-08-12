@@ -5,9 +5,9 @@ internal class FileName
 	public static string Sanitize(string fileName)
 	{
 		// Windows invalid characters
-		var invalidChars = new HashSet<char> 
-		{ 
-			'<', '>', ':', '"', '/', '\\', '|', '?', '*', '\0', 
+		var invalidChars = new HashSet<char>
+		{
+			'<', '>', ':', '"', '/', '\\', '|', '?', '*', '\0',
 		};
 
 		// Control characters (ASCII 0 through 31)
@@ -43,7 +43,7 @@ internal class FileName
 
 		if (maxNameLength <= 0)
 			return fileName;
-		
+
 		return fileName[..maxNameLength].TrimEnd('.', ' ') + extension;
 	}
 }

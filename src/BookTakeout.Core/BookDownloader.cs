@@ -1,6 +1,6 @@
 using System.Text;
+using System.Text.RegularExpressions;
 using AngleSharp;
-using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using BookTakeout.Core.Exceptions;
 using BookTakeout.Core.Values;
@@ -40,10 +40,10 @@ public sealed partial class BookDownloader(
 
 		try
 		{
-			foreach(var chapter in chapters)
+			foreach (var chapter in chapters)
 			{
 				var chapterContent = await GetChapterContentAsync(bookSlug, chapter, epubDocument, cancellationToken);
-				epubDocument.Chapters.Add(new (chapter.Title, chapterContent));
+				epubDocument.Chapters.Add(new(chapter.Title, chapterContent));
 				LogGotChapter(chapter.Index);
 
 				if (cancellationToken.IsCancellationRequested)
@@ -84,9 +84,10 @@ public sealed partial class BookDownloader(
 				pageIndex++;
 			}
 		}
-		catch (OperationCanceledException) { }
+		catch (OperationCanceledException)
+		{ }
 
-		return chapterContentBuilder.ToString();;
+		return chapterContentBuilder.ToString();
 	}
 
 	private async Task<string> ReplaceRemoteImagesWithLocalAsync(
@@ -108,7 +109,7 @@ public sealed partial class BookDownloader(
 				continue;
 			}
 
-			if (IsBase64(imageSource))
+			if (!RemoteImageSourceRegex.IsMatch(imageSource))
 				continue;
 
 			var image = await litnetHttpClient.DownloadImageAsync(imageSource, imageDescription, cancellationToken);
@@ -119,21 +120,18 @@ public sealed partial class BookDownloader(
 		return htmlDocument.ToHtml();
 	}
 
-	private static bool IsBase64(string imageSource)
-	{
-		return imageSource.StartsWith("data:", StringComparison.OrdinalIgnoreCase) &&
-			imageSource.Contains(";base64,", StringComparison.OrdinalIgnoreCase);
-	}
-
 	[LoggerMessage(LogLevel.Information, "Total number of chapters: {ChaptersCount}")]
-	partial void LogTotalNumberOfChapters(int chaptersCount);
+	private partial void LogTotalNumberOfChapters(int chaptersCount);
 
 	[LoggerMessage(LogLevel.Information, "Got chapter {ChapterIndex}")]
-	partial void LogGotChapter(int chapterIndex);
+	private partial void LogGotChapter(int chapterIndex);
 
 	[LoggerMessage(LogLevel.Error, "Error while getting chapters. Saving available data.")]
-	partial void LogErrorWhileGettingChaptersSavingAvailableData(Exception exception);
+	private partial void LogErrorWhileGettingChaptersSavingAvailableData(Exception exception);
 
 	[LoggerMessage(LogLevel.Warning, "Image source is empty")]
-	partial void LogImageSourceIsEmpty();
+	private partial void LogImageSourceIsEmpty();
+
+	[GeneratedRegex(@"^(?:(?:https?:)?\/\/)")]
+	private static partial Regex RemoteImageSourceRegex { get; }
 }

@@ -11,17 +11,18 @@ internal static class BookReaderWebPage
 		using var htmlDocument = await htmlParser.ParseDocumentAsync(webPageHtml);
 
 		var chapterIndex = 1;
-		var chapters = htmlDocument
-			.QuerySelector(selectors: "select[name='chapter']")
-			?.QuerySelectorAll(selectors: "option")
-			.Select(
-				selector: option =>
-					new ChapterInfo(
-						Index: chapterIndex++,
-						Id: option.GetAttribute("value") 
-						?? throw new NoDataException("Chapter option without value"),
-						Title: option.TextContent))
-			.ToArray()
+		var chapters
+			= htmlDocument
+				.QuerySelector(selectors: "select[name='chapter']")
+				?.QuerySelectorAll(selectors: "option")
+				.Select(
+					selector: option =>
+						new ChapterInfo(
+							Index: chapterIndex++,
+							Id: option.GetAttribute("value")
+							?? throw new NoDataException("Chapter option without value"),
+							Title: option.TextContent))
+				.ToArray()
 			?? throw new NoDataException(message: "No chapter list found");
 
 		return chapters;
