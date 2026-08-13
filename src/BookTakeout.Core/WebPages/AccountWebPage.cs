@@ -1,16 +1,14 @@
 using AngleSharp.Html.Dom;
-using AngleSharp.Html.Parser;
 using BookTakeout.Core.Exceptions;
 
-namespace BookTakeout.Core.Parsing;
+namespace BookTakeout.Core.WebPages;
 
 internal record AccountWebPage(
 	string UserName)
+	: IWebPage<AccountWebPage>
 {
-	public static async Task<AccountWebPage> ParseAsync(string webPageHtml, IHtmlParser htmlParser)
+	public static AccountWebPage Parse(IHtmlDocument htmlDocument)
 	{
-		using var htmlDocument = await htmlParser.ParseDocumentAsync(webPageHtml);
-
 		return new(
 			UserName: GetUserName(htmlDocument));
 	}

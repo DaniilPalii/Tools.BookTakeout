@@ -1,15 +1,21 @@
-using AngleSharp.Html.Parser;
+using AngleSharp.Html.Dom;
 using BookTakeout.Core.Exceptions;
 using BookTakeout.Core.Values;
 
-namespace BookTakeout.Core.Parsing;
+namespace BookTakeout.Core.WebPages;
 
-internal static class BookReaderWebPage
+internal record BookReaderWebPage(
+	ChapterInfo[] Chapters)
+	: IWebPage<BookReaderWebPage>
 {
-	public static async Task<ChapterInfo[]> GetChaptersInfoAsync(string webPageHtml, IHtmlParser htmlParser)
+	public static BookReaderWebPage Parse(IHtmlDocument htmlDocument)
 	{
-		using var htmlDocument = await htmlParser.ParseDocumentAsync(webPageHtml);
+		return new(
+			Chapters: GetChapters(htmlDocument));
+	}
 
+	private static ChapterInfo[] GetChapters(IHtmlDocument htmlDocument)
+	{
 		var chapterIndex = 1;
 		var chapters
 			= htmlDocument
@@ -19,8 +25,7 @@ internal static class BookReaderWebPage
 					selector: option =>
 						new ChapterInfo(
 							Index: chapterIndex++,
-							Id: option.GetAttribute("value")
-							?? throw new NoDataException("Chapter option without value"),
+							Id: option.GetAttribute("value") ?? throw new NoDataException("Chapter option without value"),
 							Title: option.TextContent))
 				.ToArray()
 			?? throw new NoDataException(message: "No chapter list found");

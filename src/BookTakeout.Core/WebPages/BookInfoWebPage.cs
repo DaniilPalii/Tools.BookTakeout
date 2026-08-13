@@ -1,8 +1,7 @@
 using AngleSharp.Html.Dom;
-using AngleSharp.Html.Parser;
 using BookTakeout.Core.Exceptions;
 
-namespace BookTakeout.Core.Parsing;
+namespace BookTakeout.Core.WebPages;
 
 internal record BookInfoWebPage(
 	string Title,
@@ -10,13 +9,10 @@ internal record BookInfoWebPage(
 	string Annotation,
 	string? Series,
 	string CoverSource)
+	: IWebPage<BookInfoWebPage>
 {
-	public static async Task<BookInfoWebPage> ParseAsync(
-		string webPageHtml,
-		IHtmlParser htmlParser)
+	public static BookInfoWebPage Parse(IHtmlDocument htmlDocument)
 	{
-		using var htmlDocument = await htmlParser.ParseDocumentAsync(webPageHtml);
-
 		return new(
 			Title: GetTitle(htmlDocument),
 			Author: GetAuthor(htmlDocument),

@@ -2,8 +2,8 @@ using System.Net;
 using System.Text.Json;
 using AngleSharp.Html.Parser;
 using BookTakeout.Core.Exceptions;
-using BookTakeout.Core.Parsing;
 using BookTakeout.Core.Values;
+using BookTakeout.Core.WebPages;
 using Microsoft.Extensions.Logging;
 
 namespace BookTakeout.Core;
@@ -55,14 +55,12 @@ public partial class LitnetHttpClient(
 		foreach (var cookie in cookies)
 			cookieContainer.Add(baseUri, cookie);
 
-		var homeWebPageHtml = await httpClient.GetStringAsync(baseUri, cancellationToken);
-		(var isLoggedIn, csrfToken) = await HomeWebPage.ParseAsync(homeWebPageHtml, htmlParser);
+		(var isLoggedIn, csrfToken) = await ScrapeAsync<HomeWebPage>(BaseUrl, cancellationToken);
 
 		if (!isLoggedIn)
 			throw new BadAuthorizationException();
 
-		var accountWebPageHtml = await httpClient.GetStringAsync(AccountUrl, cancellationToken);
-		var userName = (await AccountWebPage.ParseAsync(accountWebPageHtml, htmlParser)).UserName;
+		var userName = (await ScrapeAsync<AccountWebPage>(AccountUrl, cancellationToken)).UserName;
 
 		LogAuthenticationSuccessful(userName);
 
@@ -72,12 +70,11 @@ public partial class LitnetHttpClient(
 	public async Task<BookInfo> GetBookInfoWebPageAsync(string bookSlug, CancellationToken cancellationToken)
 	{
 		await Task.Delay(BetweenRequestsTimeout, cancellationToken);
-		var bookInfoUrl = BookInfoUrlPrefix + bookSlug;
 
-		var webPageHtml = await httpClient.GetStringAsync(bookInfoUrl, cancellationToken);
+		var bookInfoUrl = BookInfoUrlPrefix + bookSlug;
+		var bookInfoPage = await ScrapeAsync<BookInfoWebPage>(bookInfoUrl, cancellationToken);
 		LogBookInfoPageLoaded(bookInfoUrl);
 
-		var bookInfoPage = await BookInfoWebPage.ParseAsync(webPageHtml, htmlParser);
 		var coverImage = await DownloadImageAsync(bookInfoPage.CoverSource, "Cover", cancellationToken);
 
 		return new(
@@ -91,12 +88,12 @@ public partial class LitnetHttpClient(
 	public async Task<ChapterInfo[]> GetBookChaptersAsync(string bookSlug, CancellationToken cancellationToken)
 	{
 		await Task.Delay(BetweenRequestsTimeout, cancellationToken);
-		var bookReaderUrl = BookReaderUrlPrefix + bookSlug;
 
-		var webPageHtml = await httpClient.GetStringAsync(bookReaderUrl, cancellationToken);
+		var bookReaderUrl = BookReaderUrlPrefix + bookSlug;
+		var chapters = (await ScrapeAsync<BookReaderWebPage>(bookReaderUrl, cancellationToken)).Chapters;
 		LogBookReaderPageLoaded(bookReaderUrl);
 
-		return await BookReaderWebPage.GetChaptersInfoAsync(webPageHtml, htmlParser);
+		return chapters;
 	}
 
 	public async Task<(string content, bool isPageLast)> GetBookPageContentAsync(
@@ -156,6 +153,15 @@ public partial class LitnetHttpClient(
 			LogFailedToDownloadImage(imageSource, imageDescription, imageResponse.StatusCode);
 
 		return await imageResponse.Content.ReadAsByteArrayAsync(cancellationToken);
+	}
+
+	private async Task<TPage> ScrapeAsync<TPage>(string url, CancellationToken cancellationToken)
+		where TPage : IWebPage<TPage>
+	{
+		await using var webPageHtmlStream = await httpClient.GetStreamAsync(url, cancellationToken);
+		using var htmlDocument = await htmlParser.ParseDocumentAsync(webPageHtmlStream, cancellationToken);
+
+		return TPage.Parse(htmlDocument);
 	}
 
 	private async Task<HttpResponseMessage> PostAsync(
