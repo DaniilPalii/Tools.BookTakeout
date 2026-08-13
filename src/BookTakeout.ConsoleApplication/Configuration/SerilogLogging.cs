@@ -9,7 +9,7 @@ public static class SerilogLogging
 	{
 		Log.Logger = new LoggerConfiguration()
 			.MinimumLevel
-			.Information()
+			.Warning()
 			.WriteTo
 			.Spectre(outputTemplate: "{Message:lj}{NewLine}{Exception}")
 			.CreateLogger();

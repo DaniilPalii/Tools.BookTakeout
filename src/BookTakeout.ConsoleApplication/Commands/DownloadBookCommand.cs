@@ -97,10 +97,17 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 			return 1;
 		}
 
-		await bookDownloader.AuthenticateAsync(cancellationToken, settings.ForceLogin);
+		var userName = await bookDownloader.AuthenticateAsync(cancellationToken, settings.ForceLogin);
+		AnsiConsole.MarkupLine($"\nSuccessfully authenticated as: [green]{userName}[/]");
+
 		var downloadsPath = settings.Directory ?? OsLocations.GetDownloadsPath();
 		var chapterRange = (settings.FromChapter ?? 0)..(settings.ToChapter ?? ^0);
 		var books = new (EpubDocument epubDocument, ChapterInfo[] ChaptersInfo)[slugs.Count];
+
+		AnsiConsole.MarkupLine(
+			slugs.Count > 1
+				? "\nDownloading information about all books"
+				: "\nDownloading information about the book");
 
 		for (var i = 0; i < slugs.Count; i++)
 		{
@@ -121,7 +128,7 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 						""");
 
 				epubDocument.Series ??= await AnsiConsole.PromptAsync(
-					new TextPrompt<string?>("Enter series name (optional):")
+					new TextPrompt<string?>("[blue]Enter series name (optional):[/]")
 						.AllowEmpty()
 						.DefaultValue(null)
 						.ShowDefaultValue(false),
@@ -139,7 +146,11 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 		{
 			(var epubDocument, var chaptersInfo) = books[i];
 			var bookSlug = slugs[i];
-			AnsiConsole.MarkupLine($"\n[cyan]Downloading book:[/] \"{epubDocument.Title}\"");
+
+			AnsiConsole.MarkupLine(
+				slugs.Count > 1
+					? $"\nDownloading content for book [green]\"{epubDocument.Title}\"[/]"
+					: "\nDownloading book content");
 
 			try
 			{
@@ -153,7 +164,7 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 						new SpinnerColumn(Spinner.Known.Dots))
 					.StartAsync(async progress =>
 					{
-						var task = progress.AddTask($"Loading chapters ({0}/{chaptersInfo.Length})", maxValue: chaptersInfo.Length);
+						var task = progress.AddTask($"Chapters {0} of {chaptersInfo.Length}", maxValue: chaptersInfo.Length);
 
 						await bookDownloader.LoadChaptersAsync(
 							bookSlug,
@@ -168,7 +179,7 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 					});
 
 				var filePath = epubDocument.WriteToFile(location: downloadsPath);
-				AnsiConsole.MarkupLine($"[green]Book saved to file:[/]\n\"{filePath}\"");
+				AnsiConsole.MarkupLine($"Book saved to file:\n[green]\"{filePath}\"[/]");
 			}
 			catch (Exception ex)
 			{
@@ -176,11 +187,11 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 			}
 		}
 
-		AnsiConsole.MarkupLine("Done");
+		AnsiConsole.MarkupLine("\nDone");
 
 		if (settings.Interactive)
 		{
-			AnsiConsole.MarkupLine("Press any key to exit...");
+			AnsiConsole.MarkupLine("\nPress any key to exit...");
 			Console.ReadKey(intercept: true);
 		}
 
