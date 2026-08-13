@@ -128,12 +128,9 @@ public class EpubDocument(string title)
 	private const string CoverFilePath = $"{ImageDirectoryPath}/cover.jpg";
 	private const string ImageDirectoryPath = "images";
 
-	public class Chapter(string title, string content)
-	{
-		public string Title { get; set; } = title;
-
-		public string Content { get; set; } = content;
-	}
+	public record Chapter(
+		string Title,
+		string Content);
 
 	private record Illustration(
 		string FilePath,

@@ -15,13 +15,9 @@ public sealed partial class BookDownloader(
 	public Task<string> AuthenticateAsync(CancellationToken cancellationToken, bool forceRelogin = false)
 		=> litnetHttpClient.AuthenticateAsync(cancellationToken, forceRelogin);
 
-	public async Task<EpubDocument> DownloadAsEpubAsync(
-		string bookSlug,
-		CancellationToken cancellationToken,
-		Range? chapterRange = null)
+	public async Task<(EpubDocument epubDocument, ChapterInfo[] ChaptersInfo)> GetBookInfoAsync(string bookSlug, CancellationToken cancellationToken)
 	{
-		(var title, var author, var annotation, var series, var cover)
-			= await litnetHttpClient.GetBookInfoWebPageAsync(bookSlug, cancellationToken);
+		(var title, var author, var annotation, var series, var cover) = await litnetHttpClient.GetBookInfoWebPageAsync(bookSlug, cancellationToken);
 
 		var epubDocument = new EpubDocument(title)
 		{
@@ -32,19 +28,26 @@ public sealed partial class BookDownloader(
 			Series = series,
 		};
 
-		var chapters = await litnetHttpClient.GetBookChaptersAsync(bookSlug, cancellationToken);
-		LogTotalNumberOfChapters(chapters.Length);
+		var chaptersInfo = await litnetHttpClient.GetBookChaptersAsync(bookSlug, cancellationToken);
+		LogTotalNumberOfChapters(chaptersInfo.Length);
 
-		if (chapterRange is not null)
-			chapters = chapters[chapterRange.Value];
+		return (epubDocument, chaptersInfo);
+	}
 
+	public async Task LoadChaptersAsync(
+		string bookSlug,
+		EpubDocument epubDocument,
+		ChapterInfo[] chaptersInfo,
+		CancellationToken cancellationToken,
+		Action<int>? onChapterLoaded)
+	{
 		try
 		{
-			foreach (var chapter in chapters)
+			foreach (var chapter in chaptersInfo)
 			{
 				var chapterContent = await GetChapterContentAsync(bookSlug, chapter, epubDocument, cancellationToken);
 				epubDocument.Chapters.Add(new(chapter.Title, chapterContent));
-				LogGotChapter(chapter.Index);
+				onChapterLoaded?.Invoke(chapter.Index);
 
 				if (cancellationToken.IsCancellationRequested)
 					break;
@@ -54,8 +57,6 @@ public sealed partial class BookDownloader(
 		{
 			LogErrorWhileGettingChaptersSavingAvailableData(ex);
 		}
-
-		return epubDocument;
 	}
 
 	private async Task<string> GetChapterContentAsync(

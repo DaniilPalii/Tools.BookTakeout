@@ -97,29 +97,55 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 
 		await bookDownloader.AuthenticateAsync(cancellationToken, settings.ForceLogin);
 		var downloadsPath = settings.Directory ?? OsLocations.GetDownloadsPath();
+		var chapterRange = (settings.FromChapter ?? 0)..(settings.ToChapter ?? ^0);
 
 		foreach (var bookSlug in slugs)
 		{
 			AnsiConsole.MarkupLine($"[cyan]Downloading book:[/] {bookSlug}");
 			try
 			{
-				var epubDocument = await bookDownloader.DownloadAsEpubAsync(
+				(var epubDocument, var chaptersInfo) = await bookDownloader.GetBookInfoAsync(
 					bookSlug,
-					cancellationToken,
-					chapterRange: (settings.FromChapter ?? 0)..(settings.ToChapter ?? ^0));
+					cancellationToken);
 
 				AnsiConsole.MarkupLine(
 					$"""
 						[green]Book info:[/]
 							Title: {epubDocument.Title}
 							Author: {epubDocument.Author}
-							Series: {epubDocument.Series}
+							Series: {epubDocument.Series ?? "—"}
+							Chapters: {chaptersInfo.Length}
 						""");
 
-				epubDocument.Series ??= AnsiConsole.Prompt(
+				epubDocument.Series ??= await AnsiConsole.PromptAsync(
 					new TextPrompt<string?>("Enter series name")
 						.AllowEmpty()
-						.DefaultValue(null));
+						.DefaultValue(null),
+					cancellationToken);
+
+				chaptersInfo = chaptersInfo[chapterRange];
+
+				await AnsiConsole
+					.Progress()
+					.Columns(
+						new TaskDescriptionColumn(),
+						new ProgressBarColumn(),
+						new SpinnerColumn(Spinner.Known.Dots))
+					.StartAsync(async progress =>
+					{
+						var task = progress.AddTask($"Loading chapters ({0}/{chaptersInfo.Length})", maxValue: chaptersInfo.Length);
+
+						await bookDownloader.LoadChaptersAsync(
+							bookSlug,
+							epubDocument,
+							chaptersInfo,
+							cancellationToken,
+							onChapterLoaded: _ =>
+							{
+								task.Increment(1);
+								task.Description = $"Loading chapters ({task.Value}/{task.MaxValue})";
+							});
+					});
 
 				var filePath = epubDocument.WriteToFile(location: downloadsPath);
 				AnsiConsole.MarkupLine($"[green]Book saved to file:[/]\n\t\"{filePath}\"");
