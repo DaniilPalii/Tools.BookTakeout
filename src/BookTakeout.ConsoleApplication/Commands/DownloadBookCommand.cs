@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using BookTakeout.Core;
 using BookTakeout.Core.Helpers;
+using BookTakeout.Core.Values;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -55,7 +56,7 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 				return 1;
 			}
 
-			var input = AnsiConsole.Prompt(
+			var input = await AnsiConsole.PromptAsync(
 				new TextPrompt<string>("Enter the [green]URL(s) of the book(s)[/] (separate multiple with spaces or commas):")
 					.PromptStyle("cyan")
 					.Validate(value =>
@@ -66,7 +67,8 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 							return ValidationResult.Error("[red]Please enter valid HTTP/HTTPS URL(s)[/]");
 
 						return ValidationResult.Success();
-					}));
+					}),
+				cancellationToken);
 
 			var urls = input.Split([' ', ','], StringSplitOptions.RemoveEmptyEntries);
 			foreach (var url in urls)
@@ -98,10 +100,11 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 		await bookDownloader.AuthenticateAsync(cancellationToken, settings.ForceLogin);
 		var downloadsPath = settings.Directory ?? OsLocations.GetDownloadsPath();
 		var chapterRange = (settings.FromChapter ?? 0)..(settings.ToChapter ?? ^0);
+		var books = new (EpubDocument epubDocument, ChapterInfo[] ChaptersInfo)[slugs.Count];
 
-		foreach (var bookSlug in slugs)
+		for (var i = 0; i < slugs.Count; i++)
 		{
-			AnsiConsole.MarkupLine($"[cyan]Downloading book:[/] {bookSlug}");
+			var bookSlug = slugs[i];
 			try
 			{
 				(var epubDocument, var chaptersInfo) = await bookDownloader.GetBookInfoAsync(
@@ -110,11 +113,11 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 
 				AnsiConsole.MarkupLine(
 					$"""
-						[green]Book info:[/]
-							Title: {epubDocument.Title}
-							Author: {epubDocument.Author}
-							Series: {epubDocument.Series ?? "—"}
-							Chapters: {chaptersInfo.Length}
+
+						[green]"{epubDocument.Title}"[/]
+						Author: {epubDocument.Author}
+						Series: {epubDocument.Series ?? "—"}
+						Chapters: {chaptersInfo.Length}
 						""");
 
 				epubDocument.Series ??= await AnsiConsole.PromptAsync(
@@ -124,6 +127,22 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 						.ShowDefaultValue(false),
 					cancellationToken);
 
+				books[i] = (epubDocument, chaptersInfo);
+			}
+			catch (Exception ex)
+			{
+				AnsiConsole.MarkupLine($"[red]Failed to download book {bookSlug}:[/] {ex.Message}");
+			}
+		}
+
+		for (var i = 0; i < slugs.Count; i++)
+		{
+			(var epubDocument, var chaptersInfo) = books[i];
+			var bookSlug = slugs[i];
+			AnsiConsole.MarkupLine($"\n[cyan]Downloading book:[/] \"{epubDocument.Title}\"");
+
+			try
+			{
 				chaptersInfo = chaptersInfo[chapterRange];
 
 				await AnsiConsole
@@ -149,7 +168,7 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 					});
 
 				var filePath = epubDocument.WriteToFile(location: downloadsPath);
-				AnsiConsole.MarkupLine($"[green]Book saved to file:[/]\n\t\"{filePath}\"");
+				AnsiConsole.MarkupLine($"[green]Book saved to file:[/]\n\"{filePath}\"");
 			}
 			catch (Exception ex)
 			{
