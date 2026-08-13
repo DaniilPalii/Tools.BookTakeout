@@ -34,11 +34,11 @@ public partial class LitnetHttpClient(
 
 	public TimeSpan BetweenRequestsTimeout { get; set; } = TimeSpan.FromSeconds(seconds: 3);
 
-	public async Task AuthenticateAsync(
+	public async Task<string> AuthenticateAsync(
 		CancellationToken cancellationToken,
-		bool forceLogin = false)
+		bool forceRelogin = false)
 	{
-		if (!forceLogin
+		if (!forceRelogin
 			&& await cookieStorage.LoadCookiesAsync() is { Count: > 0 } cookies)
 		{
 			LogLoadedCookiesFromStorage(cookies.Count);
@@ -55,16 +55,18 @@ public partial class LitnetHttpClient(
 		foreach (var cookie in cookies)
 			cookieContainer.Add(baseUri, cookie);
 
-		var verificationHtml = await httpClient.GetStringAsync(BaseUrl, cancellationToken);
-		using var parsedVerificationHtml = await htmlParser.ParseDocumentAsync(verificationHtml);
-		var csrfTokenMeta = parsedVerificationHtml.QuerySelector("meta[name='csrf-token']");
-		csrfToken = csrfTokenMeta?.GetAttribute("content")
-			?? throw new NoDataException("CSRF token not found after login");
+		var homeWebPageHtml = await httpClient.GetStringAsync(baseUri, cancellationToken);
+		(var isLoggedIn, csrfToken) = await HomeWebPage.ParseAsync(homeWebPageHtml, htmlParser);
 
-		if (verificationHtml.Contains("Авторизация") || verificationHtml.Contains("LoginForm"))
+		if (!isLoggedIn)
 			throw new BadAuthorizationException();
 
-		LogAuthenticationSuccessful();
+		var accountWebPageHtml = await httpClient.GetStringAsync(AccountUrl, cancellationToken);
+		var userName = (await AccountWebPage.ParseAsync(accountWebPageHtml, htmlParser)).UserName;
+
+		LogAuthenticationSuccessful(userName);
+
+		return userName;
 	}
 
 	public async Task<BookInfo> GetBookInfoWebPageAsync(string bookSlug, CancellationToken cancellationToken)
@@ -185,8 +187,8 @@ public partial class LitnetHttpClient(
 	[LoggerMessage(LogLevel.Information, "Saved cookies to storage")]
 	private partial void LogSavedCookiesToStorage();
 
-	[LoggerMessage(LogLevel.Information, "Authentication successful")]
-	private partial void LogAuthenticationSuccessful();
+	[LoggerMessage(LogLevel.Information, "Successfully authenticated as {UserName}")]
+	private partial void LogAuthenticationSuccessful(string userName);
 
 	[LoggerMessage(LogLevel.Information, "Book info page loaded: {Url}")]
 	private partial void LogBookInfoPageLoaded(string url);
@@ -207,4 +209,5 @@ public partial class LitnetHttpClient(
 	private const string BookInfoUrlPrefix = "https://litnet.com/book/";
 	private const string BookReaderUrlPrefix = "https://litnet.com/reader/";
 	private const string GetPageUrl = "https://litnet.com/reader/get-page";
+	private const string AccountUrl = "https://litnet.com/account";
 }

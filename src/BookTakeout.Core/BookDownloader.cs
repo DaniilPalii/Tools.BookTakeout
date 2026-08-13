@@ -12,8 +12,8 @@ public sealed partial class BookDownloader(
 	LitnetHttpClient litnetHttpClient,
 	ILogger<BookDownloader> logger)
 {
-	public Task AuthenticateAsync(CancellationToken cancellationToken, bool forceLogin = false)
-		=> litnetHttpClient.AuthenticateAsync(cancellationToken, forceLogin);
+	public Task<string> AuthenticateAsync(CancellationToken cancellationToken, bool forceRelogin = false)
+		=> litnetHttpClient.AuthenticateAsync(cancellationToken, forceRelogin);
 
 	public async Task<EpubDocument> DownloadAsEpubAsync(
 		string bookSlug,
