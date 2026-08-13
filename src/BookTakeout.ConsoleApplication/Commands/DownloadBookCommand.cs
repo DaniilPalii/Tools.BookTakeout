@@ -118,9 +118,10 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 						""");
 
 				epubDocument.Series ??= await AnsiConsole.PromptAsync(
-					new TextPrompt<string?>("Enter series name")
+					new TextPrompt<string?>("Enter series name (optional):")
 						.AllowEmpty()
-						.DefaultValue(null),
+						.DefaultValue(null)
+						.ShowDefaultValue(false),
 					cancellationToken);
 
 				chaptersInfo = chaptersInfo[chapterRange];
