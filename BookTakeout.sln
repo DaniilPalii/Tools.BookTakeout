@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookTakeout.Core.UnitTests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookTakeout.DesktopApplication", "src\BookTakeout.DesktopApplication\BookTakeout.DesktopApplication.csproj", "{1476C503-3FD7-4471-B962-DA22A944584D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookTakeout.Resources", "src\BookTakeout.Resources\BookTakeout.Resources.csproj", "{A5BF5D4F-1AB0-40B9-B347-20442DEB721A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{1476C503-3FD7-4471-B962-DA22A944584D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1476C503-3FD7-4471-B962-DA22A944584D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1476C503-3FD7-4471-B962-DA22A944584D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5BF5D4F-1AB0-40B9-B347-20442DEB721A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5BF5D4F-1AB0-40B9-B347-20442DEB721A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5BF5D4F-1AB0-40B9-B347-20442DEB721A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5BF5D4F-1AB0-40B9-B347-20442DEB721A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7BF5F972-A990-4B54-B97A-6C3B42CCB328} = {F8A5899A-C242-4434-B889-8FC943FFE692}

@@ -9,6 +9,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\BookTakeout.Core\BookTakeout.Core.csproj"/>
+		<ProjectReference Include="..\BookTakeout.Resources\BookTakeout.Resources.csproj"/>
 	</ItemGroup>
 
 	<ItemGroup>

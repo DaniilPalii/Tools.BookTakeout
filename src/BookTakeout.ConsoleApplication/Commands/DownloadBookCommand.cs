@@ -2,6 +2,7 @@ using System.ComponentModel;
 using BookTakeout.Core;
 using BookTakeout.Core.Helpers;
 using BookTakeout.Core.Values;
+using BookTakeout.Resources;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -52,21 +53,22 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 
 			if (!AnsiConsole.Profile.Capabilities.Interactive)
 			{
-				AnsiConsole.MarkupLine($"[red]Error:[/] {nameof(DownloadBookCommandSettings.BookUrls)} is required in non-interactive mode.");
+				AnsiConsole.MarkupLine(
+					$"[red]{Titles.Error}:[/] {string.Format(Messages.ParameterXIsRequiredInNonInteractiveMode, Titles.BookUrls)}");
+
 				return 1;
 			}
 
 			var input = await AnsiConsole.PromptAsync(
-				new TextPrompt<string>("Enter the [green]URL(s) of the book(s)[/] (separate multiple with spaces or commas):")
-					.PromptStyle("cyan")
+				new TextPrompt<string>($"{Prompts.BookUrls}:")
+					.PromptStyle(new() { Foreground = Color.Cyan })
 					.Validate(value =>
 					{
 						var parts = value.Split([' ', ','], StringSplitOptions.RemoveEmptyEntries);
 
-						if (parts.Any(p => !BookUrl.TryGetSlug(p, out _)))
-							return ValidationResult.Error("[red]Please enter valid HTTP/HTTPS URL(s)[/]");
-
-						return ValidationResult.Success();
+						return parts.Any(p => !BookUrl.TryGetSlug(p, out _))
+							? ValidationResult.Error($"[red]{Messages.EnterValidUrls}[/]")
+							: ValidationResult.Success();
 					}),
 				cancellationToken);
 
@@ -87,18 +89,18 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 				if (BookUrl.TryGetSlug(url, out var slug))
 					slugs.Add(slug);
 				else
-					AnsiConsole.MarkupLine($"[yellow]Warning:[/] Invalid book URL skipped: {url}");
+					AnsiConsole.MarkupLine($"[yellow]{Titles.Warning}:[/] {string.Format(Messages.InvalidBookUrlSkippedX, url)}");
 			}
 		}
 
 		if (slugs.Count == 0)
 		{
-			AnsiConsole.MarkupLine("[red]No valid book URLs provided.[/]");
+			AnsiConsole.MarkupLine($"[red]{Messages.NoValidUrlsProvided}[/]");
 			return 1;
 		}
 
 		var userName = await bookDownloader.AuthenticateAsync(cancellationToken, settings.ForceLogin);
-		AnsiConsole.MarkupLine($"\nSuccessfully authenticated as: [green]{userName}[/]");
+		AnsiConsole.MarkupLine($"\n{string.Format(Messages.SuccessfullyAuthenticatedAsX, $"[green]{userName}[/]")}");
 
 		var downloadsPath = settings.Directory ?? OsLocations.GetDownloadsPath();
 		var chapterRange = (settings.FromChapter ?? 0)..(settings.ToChapter ?? ^0);
@@ -106,8 +108,8 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 
 		AnsiConsole.MarkupLine(
 			slugs.Count > 1
-				? "\nDownloading information about all books"
-				: "\nDownloading information about the book");
+				? "\n" + Messages.DownloadingInformationAboutAllBooks
+				: "\n" + Messages.DownloadingInformationAboutBook);
 
 		for (var i = 0; i < slugs.Count; i++)
 		{
@@ -122,13 +124,13 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 					$"""
 
 						[green]"{epubDocument.Title}"[/]
-						Author: {epubDocument.Author}
-						Series: {epubDocument.Series ?? "—"}
-						Chapters: {chaptersInfo.Length}
+						{Titles.Author}: {epubDocument.Author}
+						{Titles.Series}: {epubDocument.Series ?? "—"}
+						{Titles.Chapters}: {chaptersInfo.Length}
 						""");
 
 				epubDocument.Series ??= await AnsiConsole.PromptAsync(
-					new TextPrompt<string?>("[blue]Enter series name (optional):[/]")
+					new TextPrompt<string?>($"[blue]{Prompts.SeriesNameOptional}:[/]")
 						.AllowEmpty()
 						.DefaultValue(null)
 						.ShowDefaultValue(false),
@@ -138,7 +140,8 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 			}
 			catch (Exception ex)
 			{
-				AnsiConsole.MarkupLine($"[red]Failed to download book {bookSlug}:[/] {ex.Message}");
+				AnsiConsole.MarkupLine(
+					$"[red]{string.Format(Messages.FailedToDownloadBookX, bookSlug)}:[/] {string.Format(Messages.ExceptionX, ex.Message)}");
 			}
 		}
 
@@ -149,8 +152,8 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 
 			AnsiConsole.MarkupLine(
 				slugs.Count > 1
-					? $"\nDownloading content for book [green]\"{epubDocument.Title}\"[/]"
-					: "\nDownloading book content");
+					? "\n" + string.Format(Messages.DownloadingContentForBookX, $"[green]\"{epubDocument.Title}\"[/]")
+					: "\n" + string.Format(Messages.DownloadingBookContent));
 
 			try
 			{
@@ -164,7 +167,9 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 						new SpinnerColumn(Spinner.Known.Dots))
 					.StartAsync(async progress =>
 					{
-						var task = progress.AddTask($"Chapters {0} of {chaptersInfo.Length}", maxValue: chaptersInfo.Length);
+						var task = progress.AddTask(
+							string.Format(Messages.ChaptersXOfY, 0, chaptersInfo.Length),
+							maxValue: chaptersInfo.Length);
 
 						await bookDownloader.LoadChaptersAsync(
 							bookSlug,
@@ -174,24 +179,25 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 							onChapterLoaded: _ =>
 							{
 								task.Increment(1);
-								task.Description = $"Loading chapters ({task.Value}/{task.MaxValue})";
+								task.Description = string.Format(Messages.ChaptersXOfY, task.Value, task.MaxValue);
 							});
 					});
 
 				var filePath = epubDocument.WriteToFile(location: downloadsPath);
-				AnsiConsole.MarkupLine($"Book saved to file:\n[green]\"{filePath}\"[/]");
+				AnsiConsole.MarkupLine(string.Format(Messages.BookSavedToFileX, $"[green]{filePath}[/]"));
 			}
 			catch (Exception ex)
 			{
-				AnsiConsole.MarkupLine($"[red]Failed to download book {bookSlug}:[/] {ex.Message}");
+				AnsiConsole.MarkupLine(
+					$"[red]{string.Format(Messages.FailedToDownloadBookX, bookSlug)}[/] {string.Format(Messages.ExceptionX, ex.Message)}");
 			}
 		}
 
-		AnsiConsole.MarkupLine("\nDone");
+		AnsiConsole.MarkupLine("\n" + Messages.Done);
 
 		if (settings.Interactive)
 		{
-			AnsiConsole.MarkupLine("\nPress any key to exit...");
+			AnsiConsole.MarkupLine("\n" + Messages.PressAnyKeyToExit);
 			Console.ReadKey(intercept: true);
 		}
 
