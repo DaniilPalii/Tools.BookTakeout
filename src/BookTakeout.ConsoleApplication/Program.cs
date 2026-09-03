@@ -1,7 +1,7 @@
 ﻿using BookTakeout.ConsoleApplication.Commands;
 using BookTakeout.ConsoleApplication.Configuration;
 using BookTakeout.ConsoleApplication.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using Spectre.Console.Cli;
 
@@ -11,14 +11,17 @@ MemoryPackSerialization.Configure();
 
 try
 {
-	var services = new ServiceCollection();
-	services.AddAppLogger();
-	services.AddAppHttpClient();
-	services.AddAppServices();
+	var builder = Host.CreateApplicationBuilder(args);
 
-	var typeRegistrar = new TypeRegistrar(services);
+	if (builder.Configuration["Culture"] is { } cultureCode)
+		AppCulture.Set(cultureCode);
+
+	builder.Services.AddAppLogger();
+	builder.Services.AddAppHttpClient();
+	builder.Services.AddAppServices();
+
+	var typeRegistrar = new TypeRegistrar(builder);
 	var app = new CommandApp<DownloadBookCommand>(typeRegistrar);
-
 	var returnCode = await app.RunAsync(args);
 	return returnCode;
 }

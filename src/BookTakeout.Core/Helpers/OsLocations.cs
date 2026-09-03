@@ -4,6 +4,15 @@ namespace BookTakeout.Core.Helpers;
 
 public static class OsLocations
 {
+	public static string GetApplicationDataPath()
+	{
+		return Path.Combine(
+			Environment.GetFolderPath(
+				Environment.SpecialFolder.LocalApplicationData,
+				Environment.SpecialFolderOption.Create),
+			"BookTakeout");
+	}
+
 	public static string GetDownloadsPath()
 	{
 		return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)

@@ -1,4 +1,5 @@
 using System.Net;
+using BookTakeout.Core.Helpers;
 using MemoryPack;
 
 namespace BookTakeout.Core;
@@ -25,10 +26,7 @@ public class CookieStorage(string profileDirectoryName)
 
 	private string DirectoryPath
 		=> Path.Combine(
-			Environment.GetFolderPath(
-				Environment.SpecialFolder.LocalApplicationData,
-				Environment.SpecialFolderOption.Create),
-			"BookTakeout",
+			OsLocations.GetApplicationDataPath(),
 			profileDirectoryName);
 
 	private string FilePath
