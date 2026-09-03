@@ -15,7 +15,52 @@
 			PublicKeyToken=b77a5c561934e089
 		</value>
 	</resheader>
+	<data name="BookSavedToFileX" xml:space="preserve">
+    <value>Książka zapisana do pliku: "{0}".</value>
+  </data>
+	<data name="ChaptersXOfY" xml:space="preserve">
+    <value>Rozdziały {0} z {1}</value>
+  </data>
+	<data name="Done" xml:space="preserve">
+    <value>Gotowe.</value>
+  </data>
+	<data name="DownloadingBookContent" xml:space="preserve">
+    <value>Pobieranie treści książki.</value>
+  </data>
+	<data name="DownloadingContentForBookX" xml:space="preserve">
+    <value>Pobieranie treści książki {0}.</value>
+  </data>
 	<data name="DownloadingInformationAboutAllBooks" xml:space="preserve">
-		<value>Pobieranie danych o wszystkich książkach</value>
+    <value>Pobieranie informacji o wszystkich książkach.</value>
+  </data>
+	<data name="DownloadingInformationAboutBook" xml:space="preserve">
+    <value>Pobieranie informacji o książce.</value>
+  </data>
+	<data name="EnterValidUrls" xml:space="preserve">
+    <value>Wprowadź poprawne adresy URL.</value>
+  </data>
+	<data name="ErrorX" xml:space="preserve">
+		<value>Błąd: {0}.</value>
 	</data>
+	<data name="FailedToDownloadBookX" xml:space="preserve">
+    <value>Nie udało się pobrać książki {0}.</value>
+  </data>
+	<data name="InvalidBookUrlSkippedX" xml:space="preserve">
+    <value>Pominięto nieprawidłowy adres URL książki: {0}.</value>
+  </data>
+	<data name="LoadingChaptersXOfY" xml:space="preserve">
+    <value>Ładowanie rozdziałów ({0}/{1})</value>
+  </data>
+	<data name="NoValidUrlsProvided" xml:space="preserve">
+    <value>Nie podano poprawnych adresów URL książek.</value>
+  </data>
+	<data name="ParameterXIsRequiredInNonInteractiveMode" xml:space="preserve">
+    <value>Parametr "{0}" jest wymagany w trybie nieinteraktywnym.</value>
+  </data>
+	<data name="PressAnyKeyToExit" xml:space="preserve">
+    <value>Naciśnij dowolny klawisz, aby wyjść...</value>
+  </data>
+	<data name="SuccessfullyAuthenticatedAsX" xml:space="preserve">
+    <value>Pomyślnie uwierzytelniono jako {0}.</value>
+  </data>
 </root>

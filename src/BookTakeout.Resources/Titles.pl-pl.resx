@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <root>
-	<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
-				id="root"
-				xmlns="">
-		<xsd:element name="root" msdata:IsDataSet="true">
-
-		</xsd:element>
-	</xsd:schema>
 	<resheader name="resmimetype">
 		<value>text/microsoft-resx</value>
 	</resheader>
@@ -24,10 +16,25 @@
 			PublicKeyToken=b77a5c561934e089
 		</value>
 	</resheader>
+	<data name="Author" xml:space="preserve">
+    <value>Autor</value>
+  </data>
 	<data name="BookUrls" xml:space="preserve">
-    <value>Enter book URLs (separate multiple URLs with spaces or commas)</value>
+    <value>Adresy URL książek</value>
+  </data>
+	<data name="Chapters" xml:space="preserve">
+    <value>Rozdziały</value>
+  </data>
+	<data name="Error" xml:space="preserve">
+    <value>Błąd</value>
+  </data>
+	<data name="Series" xml:space="preserve">
+    <value>Seria</value>
   </data>
 	<data name="SeriesNameOptional" xml:space="preserve">
-    <value>Enter the series name (optional)</value>
+    <value>Wprowadź nazwę serii (opcjonalnie)</value>
+  </data>
+	<data name="Warning" xml:space="preserve">
+    <value>Ostrzeżenie</value>
   </data>
 </root>

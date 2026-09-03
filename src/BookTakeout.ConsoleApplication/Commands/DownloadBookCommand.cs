@@ -141,7 +141,7 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 			catch (Exception ex)
 			{
 				AnsiConsole.MarkupLine(
-					$"[red]{string.Format(Messages.FailedToDownloadBookX, bookSlug)}:[/] {string.Format(Messages.ExceptionX, ex.Message)}");
+					$"[red]{string.Format(Messages.FailedToDownloadBookX, bookSlug)}:[/] {string.Format(Messages.ErrorX, ex.Message)}");
 			}
 		}
 
@@ -189,7 +189,7 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 			catch (Exception ex)
 			{
 				AnsiConsole.MarkupLine(
-					$"[red]{string.Format(Messages.FailedToDownloadBookX, bookSlug)}[/] {string.Format(Messages.ExceptionX, ex.Message)}");
+					$"[red]{string.Format(Messages.FailedToDownloadBookX, bookSlug)}[/] {string.Format(Messages.ErrorX, ex.Message)}");
 			}
 		}
 

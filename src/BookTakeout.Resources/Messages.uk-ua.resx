@@ -15,7 +15,52 @@
 			PublicKeyToken=b77a5c561934e089
 		</value>
 	</resheader>
+	<data name="BookSavedToFileX" xml:space="preserve">
+    <value>Книгу збережено у файл: "{0}".</value>
+  </data>
+	<data name="ChaptersXOfY" xml:space="preserve">
+    <value>Розділи {0} з {1}</value>
+  </data>
+	<data name="Done" xml:space="preserve">
+    <value>Готово.</value>
+  </data>
+	<data name="DownloadingBookContent" xml:space="preserve">
+    <value>Завантаження вмісту книги.</value>
+  </data>
+	<data name="DownloadingContentForBookX" xml:space="preserve">
+    <value>Завантаження вмісту книги {0}.</value>
+  </data>
 	<data name="DownloadingInformationAboutAllBooks" xml:space="preserve">
-		<value>Завантаження даних про всі книжки</value>
+    <value>Завантаження інформації про всі книги.</value>
+  </data>
+	<data name="DownloadingInformationAboutBook" xml:space="preserve">
+    <value>Завантаження інформації про книгу.</value>
+  </data>
+	<data name="EnterValidUrls" xml:space="preserve">
+		<value>Введіть дійсні URL-адреси.</value>
 	</data>
+	<data name="ErrorX" xml:space="preserve">
+		<value>Помилка: {0}.</value>
+	</data>
+	<data name="FailedToDownloadBookX" xml:space="preserve">
+    <value>Не вдалося завантажити книгу {0}.</value>
+  </data>
+	<data name="InvalidBookUrlSkippedX" xml:space="preserve">
+    <value>Пропущено недійсну URL-адресу книги: {0}.</value>
+  </data>
+	<data name="LoadingChaptersXOfY" xml:space="preserve">
+    <value>Завантаження розділів ({0}/{1})</value>
+  </data>
+	<data name="NoValidUrlsProvided" xml:space="preserve">
+    <value>Не надано дійсних URL-адрес книг.</value>
+  </data>
+	<data name="ParameterXIsRequiredInNonInteractiveMode" xml:space="preserve">
+    <value>Параметр "{0}" є обов'язковим у неінтерактивному режимі.</value>
+  </data>
+	<data name="PressAnyKeyToExit" xml:space="preserve">
+    <value>Натисніть будь-яку клавішу, щоб вийти...</value>
+  </data>
+	<data name="SuccessfullyAuthenticatedAsX" xml:space="preserve">
+    <value>Успішно автентифіковано як {0}.</value>
+  </data>
 </root>

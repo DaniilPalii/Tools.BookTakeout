@@ -60,7 +60,7 @@ namespace BookTakeout.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter book URLs (separate multiple with spaces or commas).
+        ///   Looks up a localized string similar to Enter book URLs (separate multiple URLs with spaces or commas).
         /// </summary>
         public static string BookUrls {
             get {
@@ -69,7 +69,7 @@ namespace BookTakeout.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter series name (optional).
+        ///   Looks up a localized string similar to Enter the series name (optional).
         /// </summary>
         public static string SeriesNameOptional {
             get {

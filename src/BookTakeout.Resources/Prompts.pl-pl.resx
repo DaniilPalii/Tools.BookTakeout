@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <root>
-	<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
-				id="root"
-				xmlns="">
-		<xsd:element name="root" msdata:IsDataSet="true">
-
-		</xsd:element>
-	</xsd:schema>
 	<resheader name="resmimetype">
 		<value>text/microsoft-resx</value>
 	</resheader>
@@ -25,9 +17,9 @@
 		</value>
 	</resheader>
 	<data name="BookUrls" xml:space="preserve">
-    <value>Enter book URLs (separate multiple URLs with spaces or commas)</value>
+    <value>Wprowadź adresy URL książek (oddziel wiele adresów spacjami lub przecinkami)</value>
   </data>
 	<data name="SeriesNameOptional" xml:space="preserve">
-    <value>Enter the series name (optional)</value>
+    <value>Wprowadź nazwę serii (opcjonalnie)</value>
   </data>
 </root>

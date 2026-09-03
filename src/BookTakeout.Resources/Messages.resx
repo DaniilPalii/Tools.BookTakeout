@@ -34,7 +34,7 @@
 		<value>Parameter "{0}" is required in non-interactive mode.</value>
 	</data>
 	<data name="EnterValidUrls" xml:space="preserve">
-		<value>Please enter valid HTTP/HTTPS URL(s).</value>
+		<value>Please enter valid URL(s).</value>
 	</data>
 	<data name="InvalidBookUrlSkippedX" xml:space="preserve">
 		<value>Invalid book URL skipped: {0}.</value>
@@ -48,8 +48,8 @@
 	<data name="FailedToDownloadBookX" xml:space="preserve">
 		<value>Failed to download book {0}.</value>
 	</data>
-	<data name="ExceptionX" xml:space="preserve">
-		<value>Exception: {0}.</value>
+	<data name="ErrorX" xml:space="preserve">
+		<value>Error: {0}.</value>
 	</data>
 	<data name="DownloadingContentForBookX" xml:space="preserve">
 		<value>Downloading content for book {0}.</value>

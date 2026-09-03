@@ -123,7 +123,7 @@ namespace BookTakeout.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please enter valid HTTP/HTTPS URL(s)..
+        ///   Looks up a localized string similar to Please enter valid URL(s)..
         /// </summary>
         public static string EnterValidUrls {
             get {
@@ -132,11 +132,11 @@ namespace BookTakeout.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exception: {0}..
+        ///   Looks up a localized string similar to Error: {0}..
         /// </summary>
-        public static string ExceptionX {
+        public static string ErrorX {
             get {
-                return ResourceManager.GetString("ExceptionX", resourceCulture);
+                return ResourceManager.GetString("ErrorX", resourceCulture);
             }
         }
         
