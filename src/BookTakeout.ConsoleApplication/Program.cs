@@ -2,6 +2,7 @@
 using BookTakeout.ConsoleApplication.Configuration;
 using BookTakeout.ConsoleApplication.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Spectre.Console.Cli;
 
@@ -12,6 +13,7 @@ MemoryPackSerialization.Configure();
 try
 {
 	var builder = Host.CreateApplicationBuilder(args);
+	builder.Logging.ClearProviders();
 
 	if (builder.Configuration["Culture"] is { } cultureCode)
 		AppCulture.Set(cultureCode);
