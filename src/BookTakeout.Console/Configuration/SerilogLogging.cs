@@ -1,7 +1,7 @@
 using Serilog;
 using Serilog.Sinks.Spectre;
 
-namespace BookTakeout.ConsoleApplication.Configuration;
+namespace BookTakeout.Console.Configuration;
 
 public static class SerilogLogging
 {

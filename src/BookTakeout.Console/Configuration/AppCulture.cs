@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace BookTakeout.ConsoleApplication.Configuration;
+namespace BookTakeout.Console.Configuration;
 
 public static class AppCulture
 {

@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Spectre.Console.Cli;
 
-namespace BookTakeout.ConsoleApplication.DependencyInjection;
+namespace BookTakeout.Console.DependencyInjection;
 
 public sealed class TypeRegistrar(HostApplicationBuilder hostBuilder) : ITypeRegistrar
 {

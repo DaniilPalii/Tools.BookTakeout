@@ -1,10 +1,10 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using BookTakeout.DesktopApplication.ViewModels;
-using BookTakeout.DesktopApplication.Views;
+using BookTakeout.Desktop.ViewModels;
+using BookTakeout.Desktop.Views;
 
-namespace BookTakeout.DesktopApplication;
+namespace BookTakeout.Desktop;
 
 public partial class App : Application
 {

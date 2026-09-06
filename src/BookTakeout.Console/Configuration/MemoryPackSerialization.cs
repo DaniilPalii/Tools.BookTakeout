@@ -1,7 +1,7 @@
 using BookTakeout.Core.Serialization.Cookies;
 using MemoryPack;
 
-namespace BookTakeout.ConsoleApplication.Configuration;
+namespace BookTakeout.Console.Configuration;
 
 public static class MemoryPackSerialization
 {

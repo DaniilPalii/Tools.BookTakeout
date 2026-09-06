@@ -3,7 +3,7 @@ using BookTakeout.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
-namespace BookTakeout.ConsoleApplication.DependencyInjection;
+namespace BookTakeout.Console.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {

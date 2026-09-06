@@ -1,7 +1,6 @@
-﻿using System;
-using Avalonia;
+﻿using Avalonia;
 
-namespace BookTakeout.DesktopApplication;
+namespace BookTakeout.Desktop;
 
 internal sealed class Program
 {

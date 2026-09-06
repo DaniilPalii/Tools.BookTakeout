@@ -1,6 +1,6 @@
-﻿using BookTakeout.ConsoleApplication.Commands;
-using BookTakeout.ConsoleApplication.Configuration;
-using BookTakeout.ConsoleApplication.DependencyInjection;
+﻿using BookTakeout.Console.Commands;
+using BookTakeout.Console.Configuration;
+using BookTakeout.Console.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;

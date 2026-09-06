@@ -1,4 +1,4 @@
-﻿namespace BookTakeout.DesktopApplication.ViewModels;
+﻿namespace BookTakeout.Desktop.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {

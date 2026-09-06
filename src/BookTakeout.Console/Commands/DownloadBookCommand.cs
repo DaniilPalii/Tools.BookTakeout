@@ -6,7 +6,7 @@ using BookTakeout.Resources;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-namespace BookTakeout.ConsoleApplication.Commands;
+namespace BookTakeout.Console.Commands;
 
 public class DownloadBookCommandSettings : CommandSettings
 {
@@ -198,7 +198,7 @@ public class DownloadBookCommand(BookDownloader bookDownloader)
 		if (settings.Interactive)
 		{
 			AnsiConsole.MarkupLine("\n" + Messages.PressAnyKeyToExit);
-			Console.ReadKey(intercept: true);
+			System.Console.ReadKey(intercept: true);
 		}
 
 		return 0;
