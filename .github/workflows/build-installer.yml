@@ -1,0 +1,37 @@
+name: Build Installer
+
+on:
+    push:
+        branches: [ "main" ]
+
+jobs:
+    build:
+        runs-on: windows-latest
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: '10.0.x'
+
+            - name: Restore Dependencies
+              run: dotnet restore
+
+            - name: Build Application
+              run: dotnet build --configuration Release --no-restore
+
+            - name: Publish Application
+              run: dotnet publish --self-contained -r win-x64
+
+            - name: Compile Inno Setup Script
+              uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+              with:
+                  path: ./setup/BookTakeout.Console.iss
+
+            - name: Upload Installer Artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: BookTakeoutInstaller
+                  path: ./artifacts/setup/BookTakeout_v*.exe
