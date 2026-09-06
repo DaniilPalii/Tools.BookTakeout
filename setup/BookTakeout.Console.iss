@@ -31,6 +31,7 @@ LicenseFile = "..\setup\EndUserLicenseAgreement.txt"
 PrivilegesRequiredOverridesAllowed = dialog
 SolidCompression = yes
 WizardStyle = classic dynamic
+UninstallDisplayIcon = {app}\{#AppExeName}
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
