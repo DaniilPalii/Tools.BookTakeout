@@ -12,7 +12,7 @@
 AppName = "{#AppName}"
 AppVersion = "{#AppVersion}"
 AppVerName = "{#AppName} v{#AppVersion}"
-OutputBaseFilename = "{#CamelCaseAppName}_v{#AppVersion}"
+OutputBaseFilename = "{#CamelCaseAppName}_v{#AppVersion}_setup"
 OutputDir = "..\artifacts\setup"
 DefaultDirName = "{autopf}\{#CamelCaseAppName}"
 AppId = "{#AppId}"
