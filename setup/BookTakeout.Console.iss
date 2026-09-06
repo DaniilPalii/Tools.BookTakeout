@@ -16,6 +16,8 @@ OutputBaseFilename = "{#CamelCaseAppName}_v{#AppVersion}_setup"
 OutputDir = "..\artifacts\setup"
 DefaultDirName = "{autopf}\{#CamelCaseAppName}"
 AppId = "{#AppId}"
+ArchitecturesAllowed = x64
+ArchitecturesInstallIn64BitMode = x64
 
 [Files]
 Source: "{#ReleaseDirectoryPath}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
