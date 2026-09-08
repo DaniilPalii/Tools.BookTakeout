@@ -34,6 +34,32 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine tag to use
+        id: get_tag
+        run: |
+          $ref = $env:GITHUB_REF
+          if ($ref -like 'refs/tags/*') {
+            $tag = $ref.Substring(10)
+          } else {
+            $xml = [xml](Get-Content Directory.Build.props)
+            $v = $xml.Project.PropertyGroup.InformationalVersion
+            if (-not $v) { $v = $xml.Project.PropertyGroup.Version }
+            # Ensure tag starts with 'v'
+            if ($v -like 'v*') { $tag = $v } else { $tag = "v$v" }
+          }
+          Write-Host "Using tag: $tag"
+          echo "tag=$tag" >> $env:GITHUB_OUTPUT
+
+      - name: Create tag (if not a tag push)
+        if: "!startsWith(github.ref, 'refs/tags/')"
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git tag -a ${{ steps.get_tag.outputs.tag }} -m "Release ${{ steps.get_tag.outputs.tag }}"
+          git push origin ${{ steps.get_tag.outputs.tag }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -57,5 +83,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.get_tag.outputs.tag }}
           files: ./artifacts/setup/BookTakeout_v*.exe
           generate_release_notes: true
+          overwrite_files: true
