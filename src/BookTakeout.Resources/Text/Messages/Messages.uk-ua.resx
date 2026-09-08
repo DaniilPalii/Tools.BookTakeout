@@ -63,4 +63,7 @@
 	<data name="SuccessfullyAuthenticatedAsX" xml:space="preserve">
     <value>Успішно автентифіковано як {0}.</value>
   </data>
+	<data name="ConsoleLogo" xml:space="preserve">
+		<value>Book Takeout v{0}</value>
+	</data>
 </root>
