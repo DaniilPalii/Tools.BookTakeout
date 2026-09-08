@@ -1,89 +1,78 @@
 name: Build & Release Installer
 
 on:
-  push:
-    paths:
-      - 'Directory.Build.props'
-  workflow_dispatch:
+    push:
+        paths:
+            - 'Directory.Build.props'
+    workflow_dispatch:
 
 permissions:
-  contents: write
+    contents: write
 
 jobs:
-  check-version:
-    runs-on: ubuntu-latest
-    outputs:
-      version_changed: ${{ steps.check.outputs.changed }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
+    check-version:
+        runs-on: ubuntu-latest
+        outputs:
+            version_changed: ${{ steps.check.outputs.changed }}
+        steps:
+            -   name: Checkout repository
+                uses: actions/checkout@v4
+                with:
+                    fetch-depth: 2
 
-      - name: Check if Version changed
-        id: check
-        run: |
-          CURRENT=$(sed -n 's:.*<InformationalVersion>\(.*\)</InformationalVersion>.*:\1:p' Directory.Build.props || true)
-          PREV=$(git show HEAD~1:Directory.Build.props 2>/dev/null | sed -n 's:.*<InformationalVersion>\(.*\)</InformationalVersion>.*:\1:p' || true)
-          if [ "${CURRENT}" != "${PREV}" ]; then echo "changed=true" >> $GITHUB_OUTPUT; else echo "changed=false" >> $GITHUB_OUTPUT; fi
+            -   name: Check if Version changed
+                id: check
+                run: |
+                    CURRENT=$(sed -n 's:.*<InformationalVersion>\(.*\)</InformationalVersion>.*:\1:p' Directory.Build.props || true)
+                    PREV=$(git show HEAD~1:Directory.Build.props 2>/dev/null | sed -n 's:.*<InformationalVersion>\(.*\)</InformationalVersion>.*:\1:p' || true)
+                    if [ "${CURRENT}" != "${PREV}" ]; then echo "changed=true" >> $GITHUB_OUTPUT; else echo "changed=false" >> $GITHUB_OUTPUT; fi
 
-  build:
-    needs: check-version
-    if: needs.check-version.outputs.version_changed == 'true' || startsWith(github.ref, 'refs/tags/')
-    runs-on: windows-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    build:
+        needs: check-version
+        if: needs.check-version.outputs.version_changed == 'true' || startsWith(github.ref, 'refs/tags/')
+        runs-on: windows-latest
+        steps:
+            -   name: Checkout Repository
+                uses: actions/checkout@v4
+                with:
+                    fetch-depth: 0
 
-      - name: Determine tag to use
-        id: get_tag
-        run: |
-          $ref = $env:GITHUB_REF
-          if ($ref -like 'refs/tags/*') {
-            $tag = $ref.Substring(10)
-          } else {
-            $xml = [xml](Get-Content Directory.Build.props)
-            $v = $xml.Project.PropertyGroup.InformationalVersion
-            if (-not $v) { $v = $xml.Project.PropertyGroup.Version }
-            # Ensure tag starts with 'v'
-            if ($v -like 'v*') { $tag = $v } else { $tag = "v$v" }
-          }
-          Write-Host "Using tag: $tag"
-          echo "tag=$tag" >> $env:GITHUB_OUTPUT
+            -   name: Determine tag to use
+                id: get_tag
+                run: |
+                    $ref = $env:GITHUB_REF
+                    if ($ref -like 'refs/tags/*') {
+                      $tag = $ref.Substring(10)
+                    } else {
+                      $xml = [xml](Get-Content Directory.Build.props)
+                      $v = $xml.Project.PropertyGroup.InformationalVersion
+                      if (-not $v) { $v = $xml.Project.PropertyGroup.Version }
+                      # Ensure tag starts with 'v'
+                      if ($v -like 'v*') { $tag = $v } else { $tag = "v$v" }
+                    }
+                    Write-Host "Using tag: $tag"
+                    echo "tag=$tag" >> $env:GITHUB_OUTPUT
 
-      - name: Create tag (if not a tag push)
-        if: "!startsWith(github.ref, 'refs/tags/')"
-        run: |
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git tag -a ${{ steps.get_tag.outputs.tag }} -m "Release ${{ steps.get_tag.outputs.tag }}"
-          git push origin ${{ steps.get_tag.outputs.tag }}
+            -   name: Create tag (if not a tag push)
+                if: "!startsWith(github.ref, 'refs/tags/')"
+                run: |
+                    git config user.name "${{ github.actor }}"
+                    git config user.email "${{ github.actor }}@users.noreply.github.com"
+                    git tag -a ${{ steps.get_tag.outputs.tag }} -m "Release ${{ steps.get_tag.outputs.tag }}"
+                    git push origin ${{ steps.get_tag.outputs.tag }}
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
+            -   name: Setup .NET
+                uses: actions/setup-dotnet@v4
+                with:
+                    dotnet-version: '10.0.x'
 
-      - name: Restore Dependencies
-        run: dotnet restore
+            -   name: Run Build and Package Script
+                shell: pwsh
+                run: |
+                    ./setup/CreateInstaller.ps1
 
-      - name: Build Application
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Publish Application
-        run: dotnet publish --self-contained -r win-x64
-
-      - name: Compile Inno Setup Script
-        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
-        with:
-          path: ./setup/BookTakeout.Console.iss
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.get_tag.outputs.tag }}
-          files: ./artifacts/setup/BookTakeout_v*.exe
-          generate_release_notes: true
-          overwrite_files: true
+            -   name: Upload Installer Artifacts
+                uses: actions/upload-artifact@v4
+                with:
+                    name: setup
+                    path: ./artifacts/setup

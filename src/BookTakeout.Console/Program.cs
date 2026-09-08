@@ -22,6 +22,7 @@ var appVersion = Assembly
 	!.InformationalVersion;
 
 Console.WriteLine(Messages.ConsoleLogoVersionX, appVersion);
+Console.WriteLine();
 
 {
 	var updateManager = new UpdateManager(

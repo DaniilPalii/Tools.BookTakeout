@@ -25,6 +25,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup", "Setup", "{D15901DB
 		setup\EndUserLicenseAgreement.txt = setup\EndUserLicenseAgreement.txt
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GithubWorkflows", "GithubWorkflows", "{EA00A431-5D42-4CF2-998B-36E86C433E0D}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build-installer.yml = .github\workflows\build-installer.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
