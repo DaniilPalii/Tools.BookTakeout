@@ -1,12 +1,12 @@
 [CmdletBinding()]
 param(
-    [string]$ProjectFile = "BookTakeout.Console.csproj",
+    [string]$ProjectFile = "$PSScriptRoot\..\src\BookTakeout.Console\BookTakeout.Console.csproj",
     [string]$PackTitle = "Book Takeout",
     [string]$PackId = "DaniilPalii.BookTakeout",
     [string]$ExeName = "BookTakeout.Console.exe",
     [string]$Runtime = "win-x64",
-    [string]$PublishPath = "./artifacts/publish",
-    [string]$OutputPath = "./artifacts/setup"
+    [string]$PublishPath = "$PSScriptRoot\..\artifacts\publish",
+    [string]$OutputPath = "$PSScriptRoot\..\artifacts\setup"
 )
 
 if (-not (Get-Command vpk -ErrorAction SilentlyContinue))
@@ -21,6 +21,7 @@ dotnet publish $ProjectFile `
     --self-contained `
     -o $PublishPath
 
+$exePath = Join-Path $PublishPath $ExeName
 $version = (Get-Item $exePath).VersionInfo.ProductVersion
 
 Write-Host "Packaging with Velopack..." -ForegroundColor Cyan
@@ -28,10 +29,11 @@ vpk pack `
     --packId $PackId `
     --packTitle $PackTitle `
     --packVersion $version `
-    --packAuthor "Daniil Palii" `
+    --packAuthors "Daniil Palii" `
     --packDir $PublishPath `
     --mainExe $ExeName `
     --outputDir $OutputPath `
-    --instLicense .\setup\EndUserLicenseAgreement.txt
+    --instLicense "$PSScriptRoot\..\setup\EndUserLicenseAgreement.txt"
 
+$OutputPath = [System.IO.Path]::GetFullPath($OutputPath)
 Write-Host "Successfully packaged version $version to $OutputPath" -ForegroundColor Green
