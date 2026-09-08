@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<ApplicationIcon>favicon.ico</ApplicationIcon>
+		<ApplicationIcon>..\BookTakeout.Resources\Icons\BookTakeout.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -21,6 +21,9 @@
 	<ItemGroup>
 		<None Update="appsettings.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Include="..\BookTakeout.Resources\Icons\BookTakeout.ico">
+			<Link>BookTakeout.ico</Link>
 		</None>
 	</ItemGroup>
 

@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BookTakeout.Resources {
+namespace BookTakeout.Resources.Text {
     using System;
     
     
@@ -21,14 +21,14 @@ namespace BookTakeout.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Prompts {
+    public class Titles {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Prompts() {
+        internal Titles() {
         }
         
         /// <summary>
@@ -38,7 +38,7 @@ namespace BookTakeout.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BookTakeout.Resources.Prompts", typeof(Prompts).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BookTakeout.Resources.Text.Titles.Titles", typeof(Titles).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,7 +60,16 @@ namespace BookTakeout.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter book URLs (separate multiple URLs with spaces or commas).
+        ///   Looks up a localized string similar to Author.
+        /// </summary>
+        public static string Author {
+            get {
+                return ResourceManager.GetString("Author", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Book URLs.
         /// </summary>
         public static string BookUrls {
             get {
@@ -69,11 +78,47 @@ namespace BookTakeout.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter the series name (optional).
+        ///   Looks up a localized string similar to Chapters.
+        /// </summary>
+        public static string Chapters {
+            get {
+                return ResourceManager.GetString("Chapters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        public static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Series.
+        /// </summary>
+        public static string Series {
+            get {
+                return ResourceManager.GetString("Series", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Input series name (optional).
         /// </summary>
         public static string SeriesNameOptional {
             get {
                 return ResourceManager.GetString("SeriesNameOptional", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warning.
+        /// </summary>
+        public static string Warning {
+            get {
+                return ResourceManager.GetString("Warning", resourceCulture);
             }
         }
     }

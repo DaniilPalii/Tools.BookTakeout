@@ -2,7 +2,7 @@ using System.ComponentModel;
 using BookTakeout.Core;
 using BookTakeout.Core.Helpers;
 using BookTakeout.Core.Values;
-using BookTakeout.Resources;
+using BookTakeout.Resources.Text;
 using Spectre.Console;
 using Spectre.Console.Cli;
 

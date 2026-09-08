@@ -42,4 +42,7 @@
 	<data name="Chapters" xml:space="preserve">
 		<value>Chapters</value>
 	</data>
+	<data name="SeriesNameOptional" xml:space="preserve">
+		<value>Input series name (optional)</value>
+	</data>
 </root>
