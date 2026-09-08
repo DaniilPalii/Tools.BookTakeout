@@ -7,6 +7,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Spectre.Console.Cli;
+using Velopack;
+using Velopack.Sources;
+
+VelopackApp.Build().Run();
 
 ConsoleEncoding.Configure();
 SerilogLogging.Configure();
@@ -18,6 +22,22 @@ var appVersion = Assembly
 	!.InformationalVersion;
 
 Console.WriteLine(Messages.ConsoleLogoVersionX, appVersion);
+
+{
+	var updateManager = new UpdateManager(
+		new GithubSource(
+			repoUrl: "https://github.com/DaniilPalii/Tools.BookTakeout",
+			accessToken: null,
+			prerelease: false));
+
+	var newVersion = await updateManager.CheckForUpdatesAsync();
+	if (newVersion != null)
+	{
+		Console.WriteLine("New version available. Downloading and applying updates...");
+		await updateManager.DownloadUpdatesAsync(newVersion);
+		updateManager.ApplyUpdatesAndRestart(newVersion);
+	}
+}
 
 try
 {
