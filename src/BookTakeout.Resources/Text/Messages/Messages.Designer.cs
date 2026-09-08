@@ -141,7 +141,7 @@ namespace BookTakeout.Resources.Text {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: {0}..
+        ///   Looks up a localized string similar to Error: &quot;{0}&quot;..
         /// </summary>
         public static string ErrorX {
             get {
@@ -150,7 +150,7 @@ namespace BookTakeout.Resources.Text {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to download book {0}..
+        ///   Looks up a localized string similar to Failed to download book &quot;{0}&quot;..
         /// </summary>
         public static string FailedToDownloadBookX {
             get {
@@ -159,7 +159,7 @@ namespace BookTakeout.Resources.Text {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid book URL skipped: {0}..
+        ///   Looks up a localized string similar to Invalid book URL skipped: &quot;{0}&quot;..
         /// </summary>
         public static string InvalidBookUrlSkippedX {
             get {

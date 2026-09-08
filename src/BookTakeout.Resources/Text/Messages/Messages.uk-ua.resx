@@ -40,14 +40,14 @@
 		<value>Введіть дійсні URL-адреси.</value>
 	</data>
 	<data name="ErrorX" xml:space="preserve">
-		<value>Помилка: {0}.</value>
+		<value>Помилка: "{0}".</value>
 	</data>
 	<data name="FailedToDownloadBookX" xml:space="preserve">
-    <value>Не вдалося завантажити книгу {0}.</value>
-  </data>
+		<value>Не вдалося завантажити книгу "{0}".</value>
+	</data>
 	<data name="InvalidBookUrlSkippedX" xml:space="preserve">
-    <value>Пропущено недійсну URL-адресу книги: {0}.</value>
-  </data>
+		<value>Пропущено недійсну URL-адресу книги: "{0}".</value>
+	</data>
 	<data name="LoadingChaptersXOfY" xml:space="preserve">
     <value>Завантаження розділів ({0}/{1})</value>
   </data>

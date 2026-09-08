@@ -40,14 +40,14 @@
     <value>Wprowadź poprawne adresy URL.</value>
   </data>
 	<data name="ErrorX" xml:space="preserve">
-		<value>Błąd: {0}.</value>
+		<value>Błąd: "{0}".</value>
 	</data>
 	<data name="FailedToDownloadBookX" xml:space="preserve">
-    <value>Nie udało się pobrać książki {0}.</value>
-  </data>
+		<value>Nie udało się pobrać książki "{0}".</value>
+	</data>
 	<data name="InvalidBookUrlSkippedX" xml:space="preserve">
-    <value>Pominięto nieprawidłowy adres URL książki: {0}.</value>
-  </data>
+		<value>Pominięto nieprawidłowy adres URL książki: "{0}".</value>
+	</data>
 	<data name="LoadingChaptersXOfY" xml:space="preserve">
     <value>Ładowanie rozdziałów ({0}/{1})</value>
   </data>
