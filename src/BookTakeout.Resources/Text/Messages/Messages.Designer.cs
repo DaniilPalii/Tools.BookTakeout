@@ -177,6 +177,15 @@ namespace BookTakeout.Resources.Text {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New version available. Downloading and applying updates....
+        /// </summary>
+        public static string NewVersionAvailableDownloading {
+            get {
+                return ResourceManager.GetString("NewVersionAvailableDownloading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No valid book URLs provided..
         /// </summary>
         public static string NoValidUrlsProvided {

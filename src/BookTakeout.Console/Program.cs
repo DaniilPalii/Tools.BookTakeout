@@ -34,7 +34,7 @@ Console.WriteLine();
 	var newVersion = await updateManager.CheckForUpdatesAsync();
 	if (newVersion != null)
 	{
-		Console.WriteLine("New version available. Downloading and applying updates...");
+		Console.WriteLine(Messages.NewVersionAvailableDownloading);
 		await updateManager.DownloadUpdatesAsync(newVersion);
 		updateManager.ApplyUpdatesAndRestart(newVersion);
 	}

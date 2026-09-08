@@ -66,4 +66,7 @@
 	<data name="ConsoleLogoVersionX" xml:space="preserve">
 		<value>Book Takeout v{0}</value>
 	</data>
+	<data name="NewVersionAvailableDownloading" xml:space="preserve">
+		<value>Dostępna jest nowa wersja. Pobieranie i instalowanie aktualizacji...</value>
+	</data>
 </root>
