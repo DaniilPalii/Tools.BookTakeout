@@ -78,6 +78,15 @@ namespace BookTakeout.Resources.Text {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Book Takeout v{0}.
+        /// </summary>
+        public static string ConsoleLogoVersionX {
+            get {
+                return ResourceManager.GetString("ConsoleLogoVersionX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Done..
         /// </summary>
         public static string Done {

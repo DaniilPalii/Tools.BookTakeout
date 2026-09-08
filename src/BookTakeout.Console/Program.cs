@@ -1,6 +1,8 @@
-﻿using BookTakeout.Console.Commands;
+﻿using System.Reflection;
+using BookTakeout.Console.Commands;
 using BookTakeout.Console.Configuration;
 using BookTakeout.Console.DependencyInjection;
+using BookTakeout.Resources.Text;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -9,6 +11,13 @@ using Spectre.Console.Cli;
 ConsoleEncoding.Configure();
 SerilogLogging.Configure();
 MemoryPackSerialization.Configure();
+
+var appVersion = Assembly
+	.GetExecutingAssembly()
+	.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+	!.InformationalVersion;
+
+Console.WriteLine(Messages.ConsoleLogoVersionX, appVersion);
 
 try
 {

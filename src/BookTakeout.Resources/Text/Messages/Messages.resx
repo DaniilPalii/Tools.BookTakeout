@@ -72,4 +72,7 @@
 	<data name="PressAnyKeyToExit" xml:space="preserve">
 		<value>Press any key to exit...</value>
 	</data>
+	<data name="ConsoleLogoVersionX" xml:space="preserve">
+		<value>Book Takeout v{0}</value>
+	</data>
 </root>
