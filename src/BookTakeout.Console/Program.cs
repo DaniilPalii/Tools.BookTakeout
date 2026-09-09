@@ -1,14 +1,13 @@
-﻿using System.Reflection;
-using BookTakeout.Console.Commands;
+﻿using BookTakeout.Console.Commands;
 using BookTakeout.Console.Configuration;
 using BookTakeout.Console.DependencyInjection;
+using BookTakeout.Console.Helpers;
 using BookTakeout.Resources.Text;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Spectre.Console.Cli;
 using Velopack;
-using Velopack.Sources;
 
 VelopackApp.Build().Run();
 
@@ -16,29 +15,10 @@ ConsoleEncoding.Configure();
 SerilogLogging.Configure();
 MemoryPackSerialization.Configure();
 
-var appVersion = Assembly
-	.GetExecutingAssembly()
-	.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-	!.InformationalVersion;
-
-Console.WriteLine(Messages.ConsoleLogoVersionX, appVersion);
+Console.WriteLine(Messages.ConsoleLogoVersionX, VersionHelper.GetInformationalVersion());
 Console.WriteLine();
 
-{
-	var updateManager = new UpdateManager(
-		new GithubSource(
-			repoUrl: "https://github.com/DaniilPalii/Tools.BookTakeout",
-			accessToken: null,
-			prerelease: false));
-
-	var newVersion = await updateManager.CheckForUpdatesAsync();
-	if (newVersion != null)
-	{
-		Console.WriteLine(Messages.NewVersionAvailableDownloading);
-		await updateManager.DownloadUpdatesAsync(newVersion);
-		updateManager.ApplyUpdatesAndRestart(newVersion);
-	}
-}
+await VelopackHelper.UpdateApplicationAsync();
 
 try
 {
