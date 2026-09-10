@@ -17,19 +17,18 @@ public sealed partial class BookDownloader(
 
 	public async Task<(EpubDocument epubDocument, ChapterInfo[] ChaptersInfo)> GetBookInfoAsync(string bookSlug, CancellationToken cancellationToken)
 	{
-		(var title, var author, var annotation, var series, var cover) = await litnetHttpClient.GetBookInfoWebPageAsync(bookSlug, cancellationToken);
+		var bookInfo = await litnetHttpClient.GetBookInfoWebPageAsync(bookSlug, cancellationToken);
 
-		var epubDocument = new EpubDocument(title)
+		var epubDocument = new EpubDocument(bookInfo.Title)
 		{
-			Author = author,
-			Annotation = annotation,
+			Author = bookInfo.Author,
+			Annotation = bookInfo.Annotation,
 			Identifier = bookSlug,
-			Cover = cover,
-			Series = series,
+			Cover = bookInfo.Cover,
+			Series = bookInfo.Series,
 		};
 
 		var chaptersInfo = await litnetHttpClient.GetBookChaptersAsync(bookSlug, cancellationToken);
-		LogTotalNumberOfChapters(chaptersInfo.Length);
 
 		return (epubDocument, chaptersInfo);
 	}
@@ -120,12 +119,6 @@ public sealed partial class BookDownloader(
 
 		return htmlDocument.ToHtml();
 	}
-
-	[LoggerMessage(LogLevel.Information, "Total number of chapters: {ChaptersCount}")]
-	private partial void LogTotalNumberOfChapters(int chaptersCount);
-
-	[LoggerMessage(LogLevel.Information, "Got chapter {ChapterIndex}")]
-	private partial void LogGotChapter(int chapterIndex);
 
 	[LoggerMessage(LogLevel.Error, "Error while getting chapters. Saving available data.")]
 	private partial void LogErrorWhileGettingChaptersSavingAvailableData(Exception exception);
