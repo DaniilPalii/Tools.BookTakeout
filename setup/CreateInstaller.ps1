@@ -17,9 +17,9 @@ if (-not (Get-Command vpk -ErrorAction SilentlyContinue))
 
 Write-Host "Publishing single-file binary..." -ForegroundColor Cyan
 dotnet publish $ProjectFile `
-    -r $Runtime `
+    --runtime $Runtime `
     --self-contained `
-    -o $PublishPath
+    --output $PublishPath
 
 $exePath = Join-Path $PublishPath $ExeName
 $version = (Get-Item $exePath).VersionInfo.ProductVersion
