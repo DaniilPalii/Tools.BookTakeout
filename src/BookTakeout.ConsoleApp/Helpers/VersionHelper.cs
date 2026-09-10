@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace BookTakeout.Console.Helpers;
+namespace BookTakeout.ConsoleApp.Helpers;
 
 public static class VersionHelper
 {

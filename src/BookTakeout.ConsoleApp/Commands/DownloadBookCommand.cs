@@ -6,7 +6,7 @@ using BookTakeout.Resources.Text;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-namespace BookTakeout.Console.Commands;
+namespace BookTakeout.ConsoleApp.Commands;
 
 public class DownloadBookCommandSettings : CommandSettings
 {

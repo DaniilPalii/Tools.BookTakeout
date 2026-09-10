@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace BookTakeout.Desktop.ViewModels;
+namespace BookTakeout.DesktopApp.ViewModels;
 
 public abstract class ViewModelBase : ObservableObject;

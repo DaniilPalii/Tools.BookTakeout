@@ -2,13 +2,13 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookTakeout.Core", "src\BookTakeout.Core\BookTakeout.Core.csproj", "{3939E668-454E-4AD5-B02E-EA6B0CAD5FD3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookTakeout.Console", "src\BookTakeout.Console\BookTakeout.Console.csproj", "{B2A6FA43-A382-412C-A3A0-F6460625C857}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookTakeout.ConsoleApp", "src\BookTakeout.ConsoleApp\BookTakeout.ConsoleApp.csproj", "{B2A6FA43-A382-412C-A3A0-F6460625C857}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F8A5899A-C242-4434-B889-8FC943FFE692}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookTakeout.Core.UnitTests", "tests\BookTakeout.Core.UnitTests\BookTakeout.Core.UnitTests.csproj", "{7BF5F972-A990-4B54-B97A-6C3B42CCB328}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookTakeout.Desktop", "src\BookTakeout.Desktop\BookTakeout.Desktop.csproj", "{1476C503-3FD7-4471-B962-DA22A944584D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookTakeout.DesktopApp", "src\BookTakeout.DesktopApp\BookTakeout.DesktopApp.csproj", "{1476C503-3FD7-4471-B962-DA22A944584D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookTakeout.Resources", "src\BookTakeout.Resources\BookTakeout.Resources.csproj", "{A5BF5D4F-1AB0-40B9-B347-20442DEB721A}"
 EndProject

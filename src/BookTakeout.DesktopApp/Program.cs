@@ -1,6 +1,6 @@
 ﻿using Avalonia;
 
-namespace BookTakeout.Desktop;
+namespace BookTakeout.DesktopApp;
 
 internal sealed class Program
 {
@@ -16,9 +16,9 @@ internal sealed class Program
 		=> AppBuilder
 			.Configure<App>()
 			.UsePlatformDetect()
-#if DEBUG
+			#if DEBUG
 			.WithDeveloperTools()
-#endif
+			#endif
 			.WithInterFont()
 			.LogToTrace();
 }

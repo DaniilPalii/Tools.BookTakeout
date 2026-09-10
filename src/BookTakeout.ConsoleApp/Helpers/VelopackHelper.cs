@@ -2,7 +2,7 @@ using BookTakeout.Resources.Text;
 using Velopack;
 using Velopack.Sources;
 
-namespace BookTakeout.Console.Helpers;
+namespace BookTakeout.ConsoleApp.Helpers;
 
 public static class VelopackHelper
 {
@@ -18,7 +18,7 @@ public static class VelopackHelper
 		if (newVersion is null)
 			return;
 
-		System.Console.WriteLine(Messages.NewVersionAvailableDownloading);
+		Console.WriteLine(Messages.NewVersionAvailableDownloading);
 		await updateManager.DownloadUpdatesAsync(newVersion);
 		updateManager.ApplyUpdatesAndRestart(newVersion);
 	}

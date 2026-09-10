@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace BookTakeout.Console.Configuration;
+namespace BookTakeout.ConsoleApp.Configuration;
 
 public static class ConsoleEncoding
 {

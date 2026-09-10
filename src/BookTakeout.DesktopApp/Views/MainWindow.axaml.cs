@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace BookTakeout.Desktop.Views;
+namespace BookTakeout.DesktopApp.Views;
 
 public partial class MainWindow : Window
 {

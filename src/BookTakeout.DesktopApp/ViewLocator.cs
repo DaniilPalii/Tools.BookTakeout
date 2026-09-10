@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using BookTakeout.Desktop.ViewModels;
+using BookTakeout.DesktopApp.ViewModels;
 
-namespace BookTakeout.Desktop;
+namespace BookTakeout.DesktopApp;
 
 /// <summary>
 /// Given a view model, returns the corresponding view if possible.

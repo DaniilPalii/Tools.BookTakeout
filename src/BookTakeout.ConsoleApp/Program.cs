@@ -1,7 +1,7 @@
-﻿using BookTakeout.Console.Commands;
-using BookTakeout.Console.Configuration;
-using BookTakeout.Console.DependencyInjection;
-using BookTakeout.Console.Helpers;
+﻿using BookTakeout.ConsoleApp.Commands;
+using BookTakeout.ConsoleApp.Configuration;
+using BookTakeout.ConsoleApp.DependencyInjection;
+using BookTakeout.ConsoleApp.Helpers;
 using BookTakeout.Resources.Text;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

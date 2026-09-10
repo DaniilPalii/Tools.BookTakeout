@@ -1,9 +1,9 @@
 [CmdletBinding()]
 param(
-    [string]$ProjectFile = "$PSScriptRoot\..\src\BookTakeout.Console\BookTakeout.Console.csproj",
+    [string]$ProjectFile = "$PSScriptRoot\..\src\BookTakeout.ConsoleApp\BookTakeout.ConsoleApp.csproj",
     [string]$PackTitle = "Book Takeout",
     [string]$PackId = "DaniilPalii.BookTakeout",
-    [string]$ExeName = "BookTakeout.Console.exe",
+    [string]$ExeName = "BookTakeout.ConsoleApp.exe",
     [string]$Runtime = "win-x64",
     [string]$PublishPath = "$PSScriptRoot\..\artifacts\publish",
     [string]$OutputPath = "$PSScriptRoot\..\artifacts\setup"
